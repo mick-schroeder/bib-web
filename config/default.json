@@ -9,6 +9,6 @@
 		// "storeURL": undefined,
 		// "stylesURL": undefined,
 		// "translatePrefix": "",
-		// "translateURL": undefined
+		"translateURL": "https://llb0vb1njk.execute-api.us-east-1.amazonaws.com/Prod"
 	}
 }
