@@ -2,19 +2,22 @@
 // Brand
 //
 
-h1.brand {
-	position: relative;
-	text-align: left;
-	font-weight: 800;
-	line-height: 0.9;
-	font-size: 36px;
-	margin-left: 95px;
-}
-img.brand {
-	height: 60px;
-	width: 60px;
-	float: left;
-	margin-top: 0.2em;
-	margin-right: 1em;
-	margin-left:0.5em;
+.brand {
+	width: 188px;
+	height: 38px;
+	margin: auto;
+
+	a {
+		display: block;
+		height: 100%;
+		position: relative;
+		text-indent: -9999px;
+		overflow: hidden; // Needed for Firfox focus state
+
+		svg {
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+	}
 }

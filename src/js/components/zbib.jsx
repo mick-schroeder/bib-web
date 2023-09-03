@@ -1,248 +1,246 @@
-'use strict';
+import { Fragment, memo } from 'react';
+import PropTypes from 'prop-types';
+import cx from 'classnames';
+import { useIntl, FormattedMessage } from 'react-intl';
+import { Button, Icon } from 'web-common/components';
+import { pick } from 'web-common/utils';
 
-import AdSense from 'react-adsense-ad';
+import About from './about';
+import BibliographySection from './bibliographySection';
+import Brand from './brand';
+import CiteTools from './cite-tools';
+import ConfirmAddDialog from './confirm-add-dialog';
+import Confirmation from './confirmation';
+import CopyCitationDialog from './copy-citation-dialog';
+import Editor from './editor';
+import Footer from './footer';
+import Message from './message';
+import Modal from './modal';
+import MultipleChoiceDialog from './multiple-choice-dialog';
+import MultipleItemDialog from './multiple-items-dialog';
+import PermalinkTools from './permalink-tools';
+import Review from './review';
+import StyleInstaller from './style-installer';
+import WhatsThis from './whats-this';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const { withRouter } = require('react-router-dom');
-const cx = require('classnames');
+const commonFormats = {
+	b: (chunks) => <b>{chunks}</b>, //eslint-disable-line react/display-name
+	i: (chunks) => <i>{chunks}</i>, //eslint-disable-line react/display-name
+};
 
-const About = require('./about');
-const BibliographySection = require('./bibliographySection');
-const Brand = require('./brand');
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const CiteTools = require('./cite-tools');
-const Confirmation = require('./confirmation');
-const CopyCitationDialog = require('./copy-citation-dialog');
-const Editor = require('./editor');
-const ExportTools = require('./export-tools');
-const Icon = require('zotero-web-library/src/js/component/ui/icon');
-const Message = require('./message');
-const Modal = require('./modal');
-const MultipleChoiceDialog = require('./multiple-choice-dialog');
-const MultipleItemDialog = require('./multiple-items-dialog');
-const ConfirmAddDialog = require('./confirm-add-dialog');
-const PermalinkTools = require('./permalink-tools');
-const Review = require('./review');
-const Spinner = require('zotero-web-library/src/js/component/ui/spinner');
-const StyleInstaller = require('./style-installer');
-const UserTypeDetector = require('zotero-web-library/src/js/enhancers/user-type-detector');
-const WhatsThis = require('./whats-this');
-const Footer = require('./footer');
-const StyleSelector = require('./style-selector');
+const titleCaseExample = 'Lorem Ipsum D';
+const conversionExample = 'Lorem ipsum dolor sit amet';
+const sentenceCaseExample = (
+	<Fragment>
+		Lorem Ipsum <span style={{ color: '#e52e3d', fontWeight: 'bold' }}>D</span>olor Sit Amet
+	</Fragment>
+);
 
-class ZBib extends React.PureComponent {
-	get className() {
-		return {
-			'schroeder-bib-container': true,
-			'loading': typeof this.props.isReadOnly === 'undefined',
-			'keyboard-user': this.props.isKeyboardUser,
-			'mouse-user': this.props.isMouseUser,
-			'touch-user': this.props.isTouchUser,
-			'read-only': this.props.isReadOnly,
-			'write': !this.props.isReadOnly,
-			'welcome': this.props.messages.some(m => m.isWelcomeMessage),
-		};
-	}
+const ZBib = props => {
+	const intl = useIntl();
+	const saveToZotero = intl.formatMessage({ id: 'zbib.saveToZotero.title', defaultMessage: 'Save to Zotero' });
 
-	handleClearMessage(message) {
-		this.props.onClearMessage(message);
-	}
+	const className = {
+		'zotero-bib-container': true,
+		'read-only': props.isReadOnly,
+		'write': !props.isReadOnly,
+		'welcome': props.messages.some(m => m.kind === 'WELCOME_MESSAGE'),
+	};
 
-	handleHelp(event) {
-		this.props.onHelpClick(event);
-	}
-
-	render() {
-		return (
-			typeof this.props.isReadOnly === 'undefined'
-				? <div className={cx(this.className)}>
-					<Spinner />
+	return (
+        <div className={ cx(className) }>
+			<div className="zotero-bib-inner">
+				<div className="messages">
+					{ props.messages.map(message => (
+						<Message
+							{ ...message }
+							{ ...pick(props, ['onDismiss', 'onUndoDelete', 'onReadMore', 'onShowDuplicate'])}
+							key={ message.id }
+						/>
+						))
+					}
 				</div>
-				: <div className={cx(this.className)}>
-					<div className="schroeder-cite-inner">
-						<div className="messages">
-							{this.props.messages.map(message => (
-								<Message
-									key={message.id}
-									onDismiss={this.handleClearMessage.bind(this, message)}
-									{...message}
-								/>
-							))
-							}
-						</div>
-									<AdSense.Google
-									client='ca-pub-6344797609391119'
-									slot='3922555336'
-									style={{ display: 'block' }}
-									format='auto'
-									responsive='true'
-									className='advertisement'
-									/>
-						<div className="container">
-									{
-										!this.props.isReadOnly && (
-											<section className="section section-rounded section-cite">
-														
-												<div className="container">
-													<Brand />
-													<h3>Citation style</h3>
-													<StyleSelector {...this.props} />
-													<CiteTools {...this.props} />
-													<Review {...this.props} />
-												</div>
-											</section>
-										)
-									}
-									</div>
-									<div className="container-fullwidth">
-									<AdSense.Google
-									client='ca-pub-6344797609391119'
-									slot='3922555336'
-									style={{ display: 'block' }}
-									format='auto'
-									responsive='true'
-									className='advertisement'
-									/>
-									</div>
-									<div className="container">
-									<BibliographySection {...this.props} />
-									<section className="section section-rounded section-export">
-										<div className="container">
-											<h2>Export Bibliography</h2>
-											<ExportTools {...this.props} />
-										</div>
-									</section>
-
-						</div>
-{/* 						<div className="container">
-
-															
-								{
-									!this.props.isReadOnly && (
-										<section className="section section-rounded section-link">
-											<div className="container">
-												<h2>
-													Create a Link to this Bibliography
-													<WhatsThis />
-												</h2>
-												<PermalinkTools { ...this.props } />
-											</div>
-										</section>
-									)
-								}
-							
-						</div> 
-	*/}
-						{
-							this.props.isReadOnly && (
-								<section className="section section-brand">
-									<div className="container">
-										<Brand />
-									</div>
-								</section>
-							)
-						}
-						
-						{
-							!this.props.isReadOnly && (
-								<div className="container-fullwidth">
-									<AdSense.Google
-									client='ca-pub-6344797609391119'
-									slot='3922555336'
-									style={{ display: 'block' }}
-									format='auto'
-									responsive='true'
-									className='advertisement'
-									/>
-								</div>
-							)
-						}
-						
-						{
-							!this.props.isReadOnly && (
-								<div className="container">
-								<About {...this.props} />
-								</div>
-							)
-						}
-
-						<Footer />
-
-						<Confirmation
-							isOpen={this.props.isConfirmingStyleSwitch}
-							onConfirm={this.props.onStyleSwitchConfirm}
-							onCancel={this.props.onStyleSwitchCancel}
-							title="Converting Titles to Sentence Case"
-							confirmLabel="OK, I’ll Edit Them"
-						>
-							<p>The style you’ve selected requires titles to be in sentence case
-							rather than title case. When you use this style, it will
-							convert the titles of entries to sentence case for you, but you’ll
-								need to manually edit some entries to capitalize proper nouns:</p>
-
-							<p><b>Title case:</b> <i>Circadian Mood Variations in Twitter Content</i></p>
-							<p><b>Conversion:</b> <i>Circadian mood variations in twitter content</i></p>
-							<p><b>Sentence case:</b> <i>Circadian mood variations in <span style={{ color: '#e52e3d', fontWeight: 'bold' }}>T</span>witter content</i></p>
-						</Confirmation>
-						<Modal
-							isOpen={this.props.isSaveToZoteroVisible}
-							onRequestClose={() => this.props.onSaveToZoteroHide()}
-							className={cx('modal modal-centered')}
-						>
-							<div className="modal-content" tabIndex={-1}>
-								<div className="modal-header">
-									<h4 className="modal-title text-truncate">
-										Save to Zotero
-										</h4>
-									<Button
-										className="close"
-										onClick={this.props.onSaveToZoteroHide.bind(this)}
-									>
-										<Icon type={'24/remove'} width="24" height="24" />
-									</Button>
-								</div>
-								<div className="modal-body">
-									<p>Once you’ve <a target="_blank" rel="noopener noreferrer" href="https://www.zotero.org/download/">installed Zotero and the Zotero Connector</a>,
-										you can export your bibliography to Zotero by clicking the “Save to Zotero” button in your browser’s toolbar.</p>
-								</div>
+				<div className='xl:tw-grid xl:tw-grid-cols-2 xl:tw-gap-4'>
+				{
+					!props.isReadOnly && (
+						<section className="section section-cite">
+							<div className="container">
+								<Brand />
+								<CiteTools { ...pick(props, ['isTranslating', 'onEditorOpen', 'onTranslationCancel', 'onTranslationRequest', 'identifier']) } />
 							</div>
-						</Modal>
-						<CopyCitationDialog {...this.props} />
-						<Editor {...this.props} />
-						<MultipleChoiceDialog {...this.props} />
-						<StyleInstaller {...this.props} />
-						<ConfirmAddDialog {...this.props} />
-						<MultipleItemDialog {...this.props} />
-					</div>
+						</section>
+					)
+				}
+				{(!props.isReadOnly && (props.isTranslating || props.itemUnderReview)) && (
+					<Review { ...pick(props, ['isTranslating', 'itemUnderReview', 'onReviewEdit', 'onReviewDelete', 'onReviewDismiss', 'styleHasBibliography']) } />
+				)}
+				<BibliographySection {...pick(props, ['bibliography', 'bibliographyRendered', 'bibliographyRenderedNodes',
+					'citationStyle', 'citationStyles', 'copySingleState', 'getCopyData', 'hydrateItemsCount',
+					'isHydrated', 'isNoteStyle', 'isNumericStyle', 'isPrintMode', 'isReadOnly', 'isReady',
+					'isSortedStyle', 'localCitationsCount', 'onCancelPrintMode', 'onCitationCopyDialogOpen',
+					'onCitationStyleChanged', 'onCopySingle', 'onDeleteCitations', 'onDeleteEntry', 'onDownloadFile',
+					'onEditorOpen', 'onOverride', 'onReorderCitations', 'onSaveToZoteroShow', 'onTitleChanged',
+					'styleHasBibliography', 'title']) }
+				/>
 				</div>
-		);
-	}
+				
+				
+				{	/* TODO
+					!props.isReadOnly && (
+						<section
+							aria-labelledby="link-to-this-version"
+							className="section section-link">
+							<div className="container">
+								<div className="header-wrapper">
+									<h2 id="link-to-this-version">
+										<FormattedMessage id="zbib.linkToThis" defaultMessage="Link to this version" />
+									</h2>
+									<WhatsThis />
+								</div>
+								<PermalinkTools { ...pick(props, ['bibliography', 'isSafari', 'onSave', 'permalink']) } />
+							</div>
+						</section>
+					)
+					*/}
+				{
+					props.isReadOnly && (
+						<section className="section section-brand">
+							<div className="container">
+								<Brand />
+							</div>
+						</section>
+					)
+				}
 
-	static propTypes = {
-		citationHtml: PropTypes.string,
-		citationToCopy: PropTypes.string,
-		errorMessage: PropTypes.string,
-		isConfirmingStyleSwitch: PropTypes.bool,
-		isKeyboardUser: PropTypes.bool,
-		isMouseUser: PropTypes.bool,
-		isReadOnly: PropTypes.bool,
-		isSaveToZoteroVisible: PropTypes.bool,
-		isTouchUser: PropTypes.bool,
-		itemUnderReviewBibliography: PropTypes.object,
-		lastDeletedItem: PropTypes.object,
-		messages: PropTypes.array.isRequired,
-		onCitationCopy: PropTypes.func.isRequired,
-		onCitationCopyCancel: PropTypes.func.isRequired,
-		onCitationModifierChange: PropTypes.func.isRequired,
-		onClearMessage: PropTypes.func.isRequired,
-		onDismissUndo: PropTypes.func.isRequired,
-		onHelpClick: PropTypes.func.isRequired,
-		onSaveToZoteroHide: PropTypes.func.isRequired,
-		onStyleSwitchCancel: PropTypes.func.isRequired,
-		onStyleSwitchConfirm: PropTypes.func.isRequired,
-		onUndoDelete: PropTypes.func.isRequired,
-	}
+				{
+					!props.isReadOnly && (
+						<About onGetStartedClick={ props.onGetStartedClick } />
+					)
+				}
+
+				<Footer { ...pick(props, ['isReadOnly']) } />
+				{ (!props.isHydrated || (props.isHydrated && props.isReady)) && (
+					<Fragment>
+					<Confirmation
+						isOpen={ props.activeDialog === 'CONFIRM_SENTENCE_CASE_STYLE' }
+						onConfirm={ props.onStyleSwitchConfirm }
+						onCancel={ props.onStyleSwitchCancel }
+						title={ intl.formatMessage({ id: 'zbib.confirmCase.title', defaultMessage:'Converting Titles to Sentence Case' }) }
+						confirmLabel={ intl.formatMessage({ id: 'zbib.confirmCase.confirm', defaultMessage: 'OK. I will edit them myself.' }) }
+					>
+						<p>
+							<FormattedMessage id="zbib.confirmCase.explanation" defaultMessage="Automatically changing title to Sentence case." />
+						</p>
+
+						<p>
+							<FormattedMessage
+								id="zbib.confirmCase.titleCaseExample"
+								defaultMessage="<b>Title case:</b> <i>{ titleCaseExample }</i>"
+								values={{ ...commonFormats, titleCaseExample } }
+							/>
+						</p>
+						<p>
+							<FormattedMessage
+								id="zbib.confirmCase.conversionExample"
+								defaultMessage="<b>ZoteroBib conversion:</b> <i>{ conversionExample }</i>"
+								values={ { ...commonFormats, conversionExample }}
+							/>
+						</p>
+						<p>
+							<FormattedMessage
+								id="zbib.confirmCase.sentenceCaseExample"
+								defaultMessage="<b>Sentence case:</b> <i>{ sentenceCaseExample }</i>"
+								values={ { ...commonFormats, sentenceCaseExample } } //eslint-disable-line react/display-name
+							/>
+						</p>
+					</Confirmation>
+					<Modal
+						isOpen={ props.activeDialog === 'SAVE_TO_ZOTERO' }
+						contentLabel={ saveToZotero }
+						onRequestClose={ props.onSaveToZoteroHide }
+						className={ cx('modal modal-centered') }
+					>
+						<div className="modal-content" tabIndex={ -1 }>
+							<div className="modal-header">
+								<h4 className="modal-title text-truncate">
+									{ saveToZotero }
+								</h4>
+								<Button
+									icon
+									className="close"
+									onClick={ props.onSaveToZoteroHide }
+								>
+									<Icon type={ '24/remove' } width="24" height="24" />
+								</Button>
+							</div>
+							<div className="modal-body">
+								<p>
+									<FormattedMessage
+									id="zbib.saveToZotero.message"
+									defaultMessage="Once you’ve <a>installed Zotero and the Zotero
+									Connector</a>, you can export your bibliography to Zotero by
+									clicking the “Save to Zotero” button in your browser’s toolbar."
+									values= { {
+										a: chunk => <a target="_blank" rel="noopener noreferrer" href="https://www.zotero.org/download/">{ chunk }</a> //eslint-disable-line react/display-name
+									} }
+								/>
+								</p>
+							</div>
+						</div>
+					</Modal>
+					<CopyCitationDialog {...pick(props, ['activeDialog', 'copyCitationState',
+						'isNoteStyle', 'isNumericStyle', 'onCitationCopy', 'onCitationCopyDialogClose',
+						'onCitationModifierChange']) }
+					/>
+					{ props.isReady && <Editor { ...pick(props, ['activeDialog', 'editorItem', 'meta', 'onEditorClose',
+						'onError', 'onItemCreated', 'onItemUpdate']) }
+					/>
+					}
+					<MultipleChoiceDialog { ...pick(props, ['activeDialog',
+						'isTranslatingMore', 'moreItemsLink', 'multipleChoiceItems',
+						'onMultipleChoiceCancel', 'onMultipleChoiceMore', 'onMultipleChoiceSelect']) }
+					/>
+					<StyleInstaller { ...pick(props, ['activeDialog', 'citationStyle',
+						'citationStyles', 'isStylesDataLoading', 'onStyleInstallerCancel',
+						'onStyleInstallerDelete', 'onStyleInstallerSelect', 'stylesData']) } />
+					<ConfirmAddDialog { ...pick(props, ['activeDialog', 'onConfirmAddCancel',
+						'onConfirmAddConfirm', 'incomingStyle', 'itemToConfirm', 'selectedStyle']) } />
+					<MultipleItemDialog { ...pick(props, ['activeDialog', 'multipleItems',
+						'multipleChoiceItems', 'onMultipleItemsCancel', 'onMultipleItemsSelect']) } />
+				</Fragment>
+				) }
+			</div>
+		</div>
+    );
 }
 
-module.exports = withRouter(UserTypeDetector(ZBib));
+ZBib.propTypes = {
+	activeDialog: PropTypes.string,
+	bibliography: PropTypes.object,
+	citationHtml: PropTypes.string,
+	citationToCopy: PropTypes.string,
+	errorMessage: PropTypes.string,
+	hydrateItemsCount: PropTypes.number,
+	isConfirmingStyleSwitch: PropTypes.bool,
+	isHydrated: PropTypes.bool,
+	isReadOnly: PropTypes.bool,
+	isReady: PropTypes.bool,
+	isSaveToZoteroVisible: PropTypes.bool,
+	isTranslating: PropTypes.bool,
+	itemUnderReview: PropTypes.object,
+	itemUnderReviewBibliography: PropTypes.object,
+	lastDeletedItem: PropTypes.object,
+	messages: PropTypes.array.isRequired,
+	onCitationCopy: PropTypes.func.isRequired,
+	onCitationModifierChange: PropTypes.func.isRequired,
+	onDismiss: PropTypes.func.isRequired,
+	onGetStartedClick: PropTypes.func,
+	onHelpClick: PropTypes.func.isRequired,
+	onReadMore: PropTypes.func.isRequired,
+	onSaveToZoteroHide: PropTypes.func.isRequired,
+	onStyleSwitchCancel: PropTypes.func.isRequired,
+	onStyleSwitchConfirm: PropTypes.func.isRequired,
+	onUndoDelete: PropTypes.func.isRequired,
+}
+
+export default memo(ZBib);

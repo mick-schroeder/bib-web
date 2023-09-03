@@ -2,6 +2,12 @@
 // React-modal
 //
 
+.ReactModalPortal {
+	@media print {
+		display: none;
+	}
+}
+
 .ReactModal__Body--open {
 	overflow: hidden;
 }
@@ -15,15 +21,7 @@
 	background-color: $modal-backdrop-bg;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch; // Momentum scrolling for iOS
-}
-.modal-bottom-message {
-	text-align: center;
-	padding: $space-sm;
-	//margin: $space-xs;
-	background-color: $shade-2;
-	p {
-		margin: 0;
-	}
+	z-index: $z-index-modal;
 }
 
 .modal {
@@ -112,7 +110,6 @@
 	line-height: $modal-title-line-height;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	font-weight: 800;
 }
 
 .modal-body,
@@ -131,11 +128,11 @@
 
 	.btn {
 		&:not(:first-child) {
-			margin-left: $space-sm / 2;
+			margin-left: $space-sm * 0.5;
 		}
 
 		&:not(:last-child) {
-			margin-right: $space-sm / 2;
+			margin-right: $space-sm * 0.5;
 		}
 	}
 }

@@ -3,114 +3,27 @@
 //
 
 .cite-tools {
-	
-	h3 {
-		display: inline-block;
-		text-align: left;
-	}
+	text-align: center;
 
 	.id-input-container {
-		//display: flex;		
-		text-align: center;
-		margin-bottom: $space-sm;
+		display: flex;
+		margin-bottom: $space-lg;
 
 		@media (min-width: $bp-md) {
-			margin-bottom: $space-sm;
+			margin-bottom: $space-xl;
 		}
 	}
 
 	.input-group {
-		//margin-right: $space-min;
-
-	}
-
-	.btn-lg {
-		margin-top: 1em;
-	}
-
-	.btn-sm {
-		float: right;
-		margin-top: 1.5em;
+		margin-right: $space-min;
 	}
 
 	.form-control {
 		transition: border $input-transition, box-shadow $input-transition, padding $input-transition;
 
 		&:focus {
-			//padding-top: ($input-padding-y-lg - 2px);
-			//padding-bottom: ($input-padding-y-lg - 2px);
-		}
-	}
-}
-.style-selector {
-	text-align: left;
-
-	.Select {
-		.Select-control {
-			border-color: transparent;
-			background: $style-selector-bg;
-			color: $style-selector-color;
-			padding: $input-padding-y-lg $input-padding-x-lg;
-			border-radius: $input-border-radius-lg;
-			cursor: pointer;
-			transition:
-				background-color $input-transition,
-				border $input-transition,
-				box-shadow $input-transition;
-
-			&:hover {
-				background: $style-selector-hover-bg;
-			}
-		}
-
-		&.is-focused {
-			.Select-control {
-				box-shadow: 0 0 0 2px $secondary;
-				outline: none;
-
-				&:hover {
-					box-shadow: 0 0 0 2px $style-selector-hover-bg;
-				}
-			}
-		}
-
-		&.Select--single {
-			.Select-value-label {
-				overflow: inherit;
-				text-overflow: inherit;
-				white-space: inherit;
-			}
-		}
-
-		.Select-value {
-			position: static;
-			padding: 0;
-		}
-
-		.Select-input {
-			position: absolute;
-		}
-
-		.Select-arrow-zone {
-			margin-right: 0;
-		}
-
-		.Select-arrow {
-			background: image-url("bg-icons/16/chevron-11-down-light.svg");
-		}
-
-		.Select-menu-outer {
-			padding: $space-xs 0;
-			left: 0;
-			right: 0;
-		}
-
-		.Select-option {
-			padding: $space-min $input-btn-padding-x-lg;
-
-			&:last-child {
-				color: $link-color;
-			}
+			padding-top: ($input-padding-y-lg - 2px);
+			padding-bottom: ($input-padding-y-lg - 2px);
 		}
 	}
 }

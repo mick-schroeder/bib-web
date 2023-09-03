@@ -1,304 +1,284 @@
-'use strict';
+import { memo } from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const Button = require('zotero-web-library/src/js/component/ui/button');
+import { Button } from 'web-common/components';
+import { citationStylesCount } from '../../../data/citation-styles-data.json';
 
-class About extends React.PureComponent {
-	handleClick(event) {
-		this.props.onGetStartedClick(event);
-	}
+const About = ({ onGetStartedClick }) => (
+	<section className="section section-about about">
+		<div className="container">
+			<img
+				src="/static/images/about/citeproc.svg"
+				className="zbib-illustration"
+				width="312"
+				height="400"
+				alt="ZoteroBib"
+			/>
+			<h1>
+				<FormattedMessage id="zbib.about.title" defaultMessage="Cite anything" />
+			</h1>
+			<p className="lead">
+				<FormattedMessage
+					id="zbib.about.summary"
+					defaultMessage="ZoteroBib helps you build a bibliography instantly from any
+					computer or device, without creating an account or installing any software. It’s
+					brought to you by the team behind <link>Zotero</link>, the powerful open-source
+					research tool recommended by thousands of universities worldwide, so you can
+					trust it to help you seamlessly add sources and produce perfect bibliographies.
+					If you need to reuse sources across multiple projects or build a shared research
+					library, we recommend using Zotero instead."
+					values={ { link: chunk => <a href="https://www.zotero.org/">{ chunk }</a> }} //eslint-disable-line react/display-name
+				/>
 
-	render() {
-		return (
-			<section className="section section-about about">
-					<section className="features">
-						<div className="row">
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F4D1.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Suggesting a Citation</h2>
-									<p>
-										Paste a URL in the text box and click Suggest Citation. 
-										Automatically pull in data from thousands of medical and scientific journals, newspapers, magazine
-										articles, library catalogs, articles. You can also use an identifier such as 
-										an ISBN, DOI, PMID, or arXiv ID, or you can search by title.
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F310.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Example: Website URLs</h2>
-									<p>
-										Enter a website address (URL)
-											<ul>
-												<li><a href="https://cite.mickschroeder.com/?q=https%3A%2F%2Fwww.nejm.org%2Fdoi%2Ffull%2F10.1056%2FNEJMoa1403108">https://nejm.org/...</a></li>
-												<li><a href="https://cite.mickschroeder.com/?q=https%3A%2F%2Fwww.nytimes.com%2F2013%2F03%2F05%2Fscience%2Fchasing-the-higgs-boson-how-2-teams-of-rivals-at-CERN-searched-for-physics-most-elusive-particle.html">https://nytimes.com/...</a></li>
-											</ul>
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F4D8.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Example: Pubmed</h2>
-									<p>
-									Enter a PMID (PubMed ID) or URL
-											<ul>
-												<li><a href="https://cite.mickschroeder.com/?q=30280635">30280635</a></li>
-												<li><a href="https://cite.mickschroeder.com/?q=https%3A%2F%2Fpubmed.ncbi.nlm.nih.gov%2F30280635%2F">https://pubmed...gov/...</a></li>
-											</ul>
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F522.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Example: DOI</h2>
-									<p>
-										Provide a persistent "address" to many types of work, from journal articles to research data sets.
-										<ul>
-											<li><a href="https://cite.mickschroeder.com/?q=10.1126%2Fscience.169.3946.635">10.1126/science.169.3946.635</a></li>
-											<li><a href="https://cite.mickschroeder.com/?q=https%3A%2F%2Fdoi.org%2F10.1038/nature21360">https://doi.org/...</a></li>
-										</ul>
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F4DA.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Example: ISBN</h2>
-									<p>
-										International Standard Book Number is an unique numeric book identifier.
-										<ul>
-											<li><a href="https://cite.mickschroeder.com/?q=0323040683">0323040683</a></li>
-											<li><a href="https://cite.mickschroeder.com/?q=https%3A%2F%2Fwww.amazon.com%2Fs%3Fk%3D0702052302">https://amazon.com/...</a></li>
-										</ul>
-									</p>
-								</article>
-							</section>
-						{/*	<section className="column feature section-rounded">
-									<article>
-									<img
-										src="/static/images/openmoji/1F3F7.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Manual entry</h2>
-									<p>
-										
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/270F.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Editing an item</h2>
-									<p>
-										You might need to add or change a few fields after adding an
-										item. Click on a bibliography entry to make manual changes.
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F525.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Deleting items</h2>
-									<p>
-										Click the <i>remove</i> icon next to a bibliography entry to delete it. To start a new
-										bibliography, click <i>Delete All</i> to remove all entries.
-									</p>
-								</article>
-							</section>
-						 </div>
-						<div className="column"> */}
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/E1C1.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Style selection</h2>
-									<p>
-										Format your bibliography using AMA, APA, MLA, Chicago / Turabian,
-										or any of the 9,000+ other <a href="http://citationstyles.org/">Citation Style Language (CSL)</a> styles <a href="https://github.com/citation-style-language/styles">maintained</a> by CSL project members.
-										For more information, check out <a href="http://citationstyles.org/" rel="nofollow">CitationStyles.org</a> and the <a href="https://github.com/citation-style-language/styles/wiki">repository wiki</a>.
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/E25B.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Copy In-Text Citation and Notes</h2>
-									<p>
-										Click the "Copy Note" icon for in-text citations and endnotes / footnotes.
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F4E4.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Export Bibliography</h2>
-									<p>
-										Export your bibliography into many formats. Copy a formatted bibliography to your clipboard, HTML (for websites) or Download .RTF (for word processors), .RIS, .BibTeX, or save to Zotero.
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F468-200D-1F4BB.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">On-device Autosave</h2>
-									<p>
-										Your bibliography automatically saves to your browser’s local storage.
-										<br />
-										<b>Warning:</b> Clear your browser cache or use incognito mode if working with sensitive research.
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/E045.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Open Source</h2>
-									<p>
-									Based on <a href="https://github.com/zotero/bib-web" rel="external">ZoteroBib</a>. 
-									This program is free software: you can redistribute it and/or modify it 
-									under the terms of the <a href="https://www.gnu.org/licenses/agpl.html" rel="external">GNU Affero General Public License</a> as published 
-									by the <a href="https://www.fsf.org/" rel="external">Free Software Foundation</a>.
-									<ul>
-									<li>
-										<a href="https://github.com/mick-schroeder/schroeder-cite" rel="external">Project on GitHub</a>
-									</li>	
-									<li>
-										<a href="https://github.com/zotero/bib-web" rel="external">ZoteroBib Project on GitHub</a>
-									</li>
-									</ul>
-									</p>
-								</article>
-							</section>
-							<section className="column feature section-rounded">
-								<article>
-									<img
-										src="/static/images/openmoji/1F9E9.svg"
-										className="feature-icon"
-										width="66"
-										height="66"
-										alt=""
-									/>
-									<h2 className="h4">Browser Extensions</h2>
-									<p>
-									Automatically load the current page in your browser. 
-									<ul>
-									<li>
-										<a href="https://chrome.google.com/webstore/detail/mick-schroeders-citation/gocmebnobccjiigdnakfmlieghedgdhk" rel="external">Google Chrome Web Store</a>
-									</li>	
-									</ul>
-									</p>
-								</article>
-							</section>
-							{/* <section className="column feature section-rounded">
-								<img
-									src="/static/images/about/link.svg"
-									className="feature-icon"
-									width="66"
-									height="66"
-									alt=""
-								/>
-								<h2 className="h4">Link to this version</h2>
-								<p>
-									If you want to edit your bibliography on another device, share
-									it with someone else, or switch to another bibliography, you
-									can generate a link to a copy of the current version on
-									zbib.org. Use the link to retrieve your bibliography later.
-								</p>
-							</section> */}
-						</div>
+			</p>
+			<section className="features">
+				<div className="column">
+					<section className="feature">
+						<img
+							src="/static/images/about/cite.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.addingEntry.header" defaultMessage="Adding a bibliography entry" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.addingEntry.description"
+								defaultMessage="Simply find what you’re looking for in another
+								browser tab and copy the page URL to the ZoteroBib search bar.
+								ZoteroBib can automatically pull in data from newspaper and magazine
+								articles, library catalogs, journal articles, sites like Amazon and
+								Google Books, and much more. You can also paste or type in an ISBN,
+								DOI, PMID, or arXiv ID, or you can search by title."
+							/>
+						</p>
 					</section>
-					<Button
-						onClick={ this.handleClick.bind(this) }
-						className="btn-lg btn-secondary"
-					>
-						Sounds Good. Let’s start!
-					</Button>
-					<p className="support"></p>
+					<section className="feature">
+						<img
+							src="/static/images/about/manual-entry.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.manualEntry.header" defaultMessage="Manual entry" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.manualEntry.description"
+								defaultMessage="If automatic import doesn’t find what you’re looking
+								for or you’re entering something without a URL or identifier, you
+								can enter the reference information by hand."
+							/>
+						</p>
+					</section>
+					<section className="feature">
+						<img
+							src="/static/images/about/bibliography-title.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.settingTitle.header" defaultMessage="Bibliography title" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.settingTitle.description"
+								defaultMessage="To rename your bibliography, just click its title. A
+								title can be useful if you’re switching between multiple projects or
+								sharing a bibliography with others."
+							/>
+						</p>
+					</section>
+					<section className="feature">
+						<img
+							src="/static/images/about/editing.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.editingItem.header" defaultMessage="Editing an item" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.editingItem.description"
+								defaultMessage="You might need to add or change a few fields after adding an
+								item. Click on a bibliography entry to make manual changes."
+							/>
+						</p>
+					</section>
+					<section className="feature">
+						<img
+							src="/static/images/about/deleting-items.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.deletingItems.header" defaultMessage="Deleting items" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.deletingItems.description"
+								defaultMessage="Click the { deleteIcon } next to a bibliography entry to delete it. To start a new
+								bibliography, click <i>Delete Bibliography</i> to remove all entries."
+								values={ {
+									deleteIcon: <img
+										src="/static/images/about/remove-xs.svg"
+										className="remove-icon"
+										width="14"
+										height="14"
+										alt="Remove icon" />,
+									i: chunk => <i>{ chunk }</i>  //eslint-disable-line react/display-name
+								} }
+							/>
+						</p>
+					</section>
+				</div>
+				<div className="column">
+					<section className="feature">
+						<img
+							src="/static/images/about/style-selection.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.styleSelection.header" defaultMessage="Style selection" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.styleSelection.description"
+								defaultMessage="Format your bibliography using APA, MLA, Chicago / Turabian,
+									Harvard, or any of the {citationStylesCount, plural, other {#+ other <link>CSL</link> styles} }."
+								values={ {
+									citationStylesCount: Math.floor(citationStylesCount / 1000) * 1000,
+									link: chunk => <a href="https://citationstyles.org/">{ chunk }</a> //eslint-disable-line react/display-name
+								} }
+							/>
+						</p>
+					</section>
+					<section className="feature">
+						<img
+							src="/static/images/about/copy.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.copyCitation.header" defaultMessage="Copy Citation / Note" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.copyCitation.description"
+								defaultMessage="As you’re writing, you can quickly generate
+								parenthetical citations or footnotes /endnotes to paste into your
+								document without typing names or dates by hand."
+							/>
+						</p>
+					</section>
+					<section className="feature">
+						<img
+							src="/static/images/about/export.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.export.header" defaultMessage="Export" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.export.description"
+								defaultMessage="When you’re done, you can copy a formatted
+								bibliography to the clipboard and paste it into your document. You
+								can also export HTML to add to a webpage, an RTF document to open in
+								a word processor, or a RIS or BibTeX file to import into a reference
+								manager."
+							/>
+						</p>
+					</section>
+					<section className="feature">
+						<img
+							src="/static/images/about/autosave.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.autosave.header" defaultMessage="Autosave" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.autosave.description"
+								defaultMessage="ZoteroBib automatically saves your bibliography to
+								your browser’s local storage — you can close the page and return to
+								it anytime. (If you’re using private / incognito mode in your
+								browser, your bibliography will be cleared when you close the
+								window.)"
+							/>
+						</p>
+					</section>
+					<section className="feature">
+						<img
+							src="/static/images/about/link.svg"
+							className="feature-icon"
+							width="66"
+							height="66"
+							alt=""
+						/>
+						<h2 className="h4">
+							<FormattedMessage id="zbib.about.linkToVersion.header" defaultMessage="Link to this version" />
+						</h2>
+						<p>
+							<FormattedMessage
+								id="zbib.about.linkToVersion.description"
+								defaultMessage="If you want to edit your bibliography on another
+								device, share it with someone else, or switch to another
+								bibliography, you can generate a link to a copy of the current
+								version on zbib.org. Use the link to retrieve your bibliography
+								later."
+							/>
+						</p>
+					</section>
+				</div>
 			</section>
-		);
-	}
+			<Button
+				onClick={ onGetStartedClick }
+				className="btn-lg btn-outline-inverse-blue-dark"
+			>
+				<FormattedMessage id="zbib.about.CTA" defaultMessage="Awesome! Let’s start!" />
+			</Button>
+			<p className="support">
+				<FormattedMessage
+					id="zbib.about.questionsFaq"
+					defaultMessage="<block>Still have questions?</block> Check the <link>FAQ</link>."
+					values={ {
+						block: chunk => <span className="d-xs-block d-sm-inline">{ chunk }</span>, //eslint-disable-line react/display-name
+						link: chunk => <a href="/faq">{ chunk }</a> //eslint-disable-line react/display-name
+					} }
+				/>
+			</p>
+		</div>
+	</section>
+);
 
-	static propTypes = {
-		onGetStartedClick: PropTypes.func.isRequired,
-	}
+About.propTypes = {
+	onGetStartedClick: PropTypes.func.isRequired,
 }
 
-module.exports = About;
+export default memo(About);

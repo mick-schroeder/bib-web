@@ -4,13 +4,13 @@
 
 .section-review {
 	padding: 0;
-	margin: 0;
 	overflow: hidden;
 }
 
 .review {
-	//font-size: 20px;
-	//border-top-color: $review-border-color;
+	font-size: 20px;
+	background: $review-bg;
+	border-top-color: $review-border-color;
 	position: relative;
 	min-height: 143px; // Dev
 
@@ -18,25 +18,14 @@
 		min-height: 184px; // Dev
 	}
 
-	
-	.citation {
-		padding: 1em;
-		background: $review-bg;
-	}
-
-
 	.container {
-		padding-top: $space-md - 7px;
-		padding-bottom: 0;
-		padding-left: 0;
-		padding-right: 0;
+		padding-top: $space-xl - 7px;
+		padding-bottom: $space-xl;
 
 		@media (min-width: $bp-md) {
-			padding-top: $space-md - 7px; // Caps height
-			padding-bottom: 0;
+			padding-top: $space-xxl - 7px; // Caps height
+			padding-bottom: $space-xxl;
 		}
-
-		width: auto;
 	}
 
 	h2 {
@@ -68,17 +57,6 @@
 		@media (max-width: $bp-sm - 1px) {
 			min-width: 0;
 		}
-	}
-
-	// Hide list #
-	.csl-left-margin {
-		display: none !important;
-	}
-
-
-	.csl-right-inline {
-		font-size: 18px !important;
-		margin: 0.5em !important;
 	}
 
 	// Dev only

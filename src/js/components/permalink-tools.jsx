@@ -1,109 +1,90 @@
-/* eslint-disable react/no-deprecated */
-// @TODO: migrate to getDerivedStateFromProps()
-'use strict';
+import copy from 'copy-to-clipboard';
+import cx from 'classnames';
+import PropTypes from 'prop-types';
+import { Fragment, useCallback, useState, memo } from 'react';
+import { useIntl, FormattedMessage } from 'react-intl';
+import { Button, Spinner } from 'web-common/components';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const copy = require('copy-to-clipboard');
-const cx = require('classnames');
+const PermalinkTools = ({ bibliography, isSafari, onSave, permalink }) => {
+	const [isSavingPermalink, setIsSavingPermalink] = useState(false);
+	const [isRecentlyCopied, setIsRecentlyCopied] = useState(false);
+	const intl = useIntl();
 
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const Spinner = require('zotero-web-library/src/js/component/ui/spinner');
-
-class PermalinkTools extends React.Component {
-	state = {
-		isSavingPermalink: false,
-		isRecentlyCopied: false
-	}
-
-	async componentWillReceiveProps(props) {
-		if(this.props.permalink != props.permalink) {
-			this.setState({
-				isSavingPermalink: false
-			});
+	const handleCreateLink = useCallback(async () => {
+		if(!permalink) {
+			setIsSavingPermalink(true);
+			await onSave();
+			setIsSavingPermalink(false);
 		}
-	}
+	}, [onSave, permalink]);
 
-	handleCreateLink() {
-		if(!this.props.permalink) {
-			this.setState({
-				isSavingPermalink: true
-			});
-			this.props.onSave();
+	const handleCopy = useCallback(() => {
+		if(copy(permalink) && !isRecentlyCopied) {
+			setIsRecentlyCopied(true);
+			setTimeout(() => {
+				setIsRecentlyCopied(false)
+			}, 1000);
 		}
-	}
+	}, [isRecentlyCopied, permalink]);
 
-	handleClipoardSuccess() {
-		if(this.state.isRecentlyCopied) {
-			return;
-		}
-
-		this.setState({
-			isRecentlyCopied: true
-		});
-
-		setTimeout(() => {
-			this.setState({
-				isRecentlyCopied: false
-			});
-		}, 1000);
-	}
-
-	handleCopy() {
-		const result = copy(this.props.permalink);
-		if(result) {
-			this.handleClipoardSuccess();
-		}
-	}
-
-	render() {
-		if(this.state.isSavingPermalink) {
-			return (
-				<div className="permalink-tools loading">
-					<Spinner />
+	return (
+        <div className={cx('permalink-tools', { 'loading': isSavingPermalink }) }>
+			{ isSavingPermalink ? (
+				<Spinner />
+			) : permalink ? (
+				<div className="btn-wrap">
+					<Button
+						className={
+							cx('btn btn-lg btn-block btn-secondary',
+								{ success: isRecentlyCopied })
+						}
+						data-clipboard-text={permalink}
+						onClick={handleCopy}
+					>
+						{isRecentlyCopied ?
+							intl.formatMessage({ id: 'zbib.permalink.copyFeedback', defaultMessage: 'Copied!' }) :
+							intl.formatMessage({ id: 'zbib.permalink.copyURL', defaultMessage: 'Copy URL' })
+						}
+					</Button>
+					<a
+						className="btn btn-lg btn-block btn-secondary"
+						href={permalink}>
+						<FormattedMessage id="zbib.permalink.view" defaultMessage="View" />
+					</a>
 				</div>
-			);
-		}
-
-		return this.props.permalink ? (
-			<div className="permalink-tools">
-				<Button
-					className={
-						cx('btn btn-lg btn-block btn-secondary',
-						{ success: this.state.isRecentlyCopied})
-					}
-					data-clipboard-text={ this.props.permalink }
-					onClick={ this.handleCopy.bind(this) }
-				>
-					{ this.state.isRecentlyCopied ? 'Copied!' : 'Copy URL' }
-				</Button>
-				<a
-					className="btn btn-lg btn-block btn-secondary"
-					href={ this.props.permalink }>
-					View
-				</a>
-			</div>
 			) : (
-			<Button
-				disabled={ this.props.items.length === 0 }
-				className="btn-lg btn-outline-secondary btn-min-width"
-				onClick={ this.handleCreateLink.bind(this) }
-			>
-				Create
-			</Button>
-		);
-	}
-
-	static defaultProps = {
-		items: []
-	}
-
-	static propTypes = {
-		items: PropTypes.array,
-		onSave: PropTypes.func.isRequired,
-		permalink: PropTypes.string,
-	}
+				<Fragment>
+					{ isSafari && (
+						<div className="safari-warning">
+							<p><strong><FormattedMessage
+								id="zbib.permalink.safari.warning"
+								defaultMessage="If you don’t visit zbib.org for 7 days, your browser will automatically remove your bibliography."
+							/></strong></p>
+							<p><FormattedMessage
+								id="zbib.permalink.safari.recommendation"
+								defaultMessage="We recommend saving your bibliography by creating a permalink."
+							/></p>
+						</div>
+					) }
+					<Button
+						disabled={bibliography.items.length === 0}
+						className="btn-lg btn-outline-secondary btn-min-width"
+						onClick={handleCreateLink}
+					>
+						<FormattedMessage id="zbib.permalink.create" defaultMessage="Create" />
+					</Button>
+				</Fragment>
+			) }
+		</div>
+    );
 }
 
 
-module.exports = PermalinkTools;
+PermalinkTools.propTypes = {
+	bibliography: PropTypes.object,
+	isSafari: PropTypes.bool,
+	onSave: PropTypes.func.isRequired,
+	permalink: PropTypes.string,
+}
+
+export default memo(PermalinkTools);

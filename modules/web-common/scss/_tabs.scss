@@ -1,0 +1,97 @@
+@import "abstracts/defaults";
+@import "abstracts/functions/asset-url";
+@import "abstracts/mixins/breakpoints";
+@import "abstracts/mixins/hairline";
+@import "abstracts/mixins/selectors";
+@import "abstracts/mixins/utilities";
+
+.tabs {
+	display: flex;
+	border-bottom: $border-width solid $tabs-border-color;
+
+	&.justified {
+		width: 100%;
+	}
+
+	li {
+		flex: 0 0 auto;
+		display: flex;
+
+		@include variant(".tabs.justified") {
+			flex: 1 1 0;
+		}
+
+		button {
+			align-items: center;
+			appearance: none;
+			background: none;
+			border: none;
+			color: $tab-inactive-color;
+			cursor: pointer;
+			display: inline;
+			flex: 1 1 auto;
+			font-family: inherit;
+			font-size: $font-size-base;
+			font-weight: inherit;
+			height: $tabs-height;
+			justify-content: center;
+			padding: 0 $tabs-padding-x;
+			text-decoration: none;
+
+			@include text-truncate;
+
+			@include touch-or-bp-down(sm) {
+				height: $tabs-height-touch;
+			}
+
+			&:hover {
+				color: $tab-active-color;
+				text-decoration: none;
+			}
+
+			&:focus {
+				@include state(".keyboard button") {
+					outline: $outline-width solid $outline-color;
+					outline-offset: -$outline-width;
+				}
+			}
+
+			@include state("li.active") {
+				color: $tab-active-color;
+				box-shadow: inset 0 -1px $tab-active-color, 0 1px $tab-active-color;
+
+				&:focus-within {
+					box-shadow: none;
+				}
+			}
+
+			@include variant(".tabs.compact") {
+				padding: 0 $tabs-compact-padding-x;
+			}
+		}
+	}
+
+	.icon {
+		margin-right: $space-xs;
+	}
+}
+
+.tab-pane {
+	display: none;
+
+	&.active {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+
+		&.loading {
+			@include state("html:not(.specifity)") {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100%;
+				padding: 0;
+			}
+		}
+	}
+}

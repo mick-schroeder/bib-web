@@ -28,7 +28,7 @@
 // Layout
 //
 
-//@import "layout/fonts";
+@import "layout/fonts";
 @import "layout/grid";
 @import "layout/forms";
 @import "layout/csl";
@@ -50,14 +50,15 @@
 //
 
 @import "components/cite-tools";
-@import "components/icon";
+@import "components/dnd";
+@import "../../modules/web-common/scss/icon";
 @import "components/button";
 @import "components/review";
 @import "components/bibliography-section";
 @import "components/bibliography";
-@import "components/select";
+@import "../../modules/web-common/scss/select";
 @import "components/editable";
-@import "components/dropdown";
+@import "../../modules/web-common/scss/dropdown";
 @import "components/react-modal";
 @import "components/editor";
 @import "components/style-installer";
@@ -69,3 +70,6 @@
 @import "components/input";
 @import "components/copy-citation-dialog";
 @import "components/about";
+@import "components/creators";
+@import "components/crash-handler";
+@import "../../modules/web-common/scss/tabs";

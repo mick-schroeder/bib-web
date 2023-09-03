@@ -1,7 +1,11 @@
 footer {
-	padding: (43px - 6px) ($grid-gutter-width / 2) (43px - 5px);
+	padding: (43px - 6px) ($grid-gutter-width * 0.5) (43px - 5px);
 	text-align: center;
 	border-top: 1px solid $shade-2;
+
+	@media print {
+		display: none;
+	}
 
 	@media (min-width: $bp-md) {
 		padding-top: ($space-xxxl - 6px);
@@ -22,8 +26,8 @@ footer {
 		&::before {
 			content: "";
 			position: absolute;
-			left: $grid-gutter-width / 2;
-			right: $grid-gutter-width / 2;
+			left: $grid-gutter-width * 0.5;
+			right: $grid-gutter-width * 0.5;
 			top: -1px;
 			height: 1px;
 			background-color: $shade-2;
@@ -38,14 +42,30 @@ footer {
 		display: block;
 		font-size: 12px;
 		opacity: 0.4;
+
+		ul {
+			list-style: none;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			padding: 0;
+			margin: 0;
+
+			li + li {
+				&::before {
+					content: "•";
+					padding: 0 5px;
+				}
+			}
+		}
 	}
 }
 
-.schroeder-bib-container {
+.zotero-bib-container {
 	&.write {
 		footer {
 			border-top-color: rgba(0, 0, 0, 0.2);
-			background: #222;
+			background: $about-bg;
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
 

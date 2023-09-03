@@ -1,5 +1,19 @@
+import CiteprocWrapper from './citeproc-wrapper';
+
+const formatFallback = bibliographyItems => {
+	return `<ol><li>${bibliographyItems.map(renderedItem => renderedItem.value).join('</li><li>')}</li></ol>`;
+}
+
+// adapter from citeproc-rs output
+const formatBib = (bibliographyItems, bibliographyMeta) => {
+	return formatBibLegacy([
+		CiteprocWrapper.metaCiteprocRStoJS(bibliographyMeta),
+		bibliographyItems.map(renderedItem => renderedItem.value)
+	]);
+};
+
 // adapted from https://github.com/zotero/zotero/blob/553d2b00d86f852e051a9d76474993cd0575f7cd/chrome/content/zotero/xpcom/cite.js#L140-L274
-const formatBib = (bib) => {
+const formatBibLegacy = (bib) => {
 	var output = [
 		bib[0].bibstart,
 		...bib[1],
@@ -114,4 +128,37 @@ const formatBib = (bib) => {
 	return container.innerHTML;
 };
 
-module.exports = formatBib;
+const getBibliographyFormatParameters = bibliographyMeta =>
+	getBibliographyFormatParametersLegacy([CiteprocWrapper.metaCiteprocRStoJS(bibliographyMeta)]);
+
+/**
+	 * copied from https://github.com/zotero/zotero/blob/1f5639da4297ac20fd21223d2004a7cfeef72e21/chrome/content/zotero/xpcom/cite.js#L43
+	 * Convert formatting data from citeproc-js bibliography object into explicit format
+	 * parameters for RTF or word processors
+	 * @param {bib} citeproc-js bibliography object
+	 * @return {Object} Bibliography style parameters.
+ */
+const getBibliographyFormatParametersLegacy = bib => {
+		var bibStyle = {'tabStops':[], 'indent':0, 'firstLineIndent':0,
+						'lineSpacing':(240 * bib[0].linespacing),
+						'entrySpacing':(240 * bib[0].entryspacing)};
+		if(bib[0].hangingindent) {
+			bibStyle.indent = 720;				// 720 twips = 0.5 in
+			bibStyle.firstLineIndent = -720;	// -720 twips = -0.5 in
+		} else if(bib[0]['second-field-align']) {
+			// this is a really sticky issue. the below works for first fields that look like "[1]"
+			// and "1." otherwise, i have no idea. luckily, this will be good enough 99% of the time.
+			var alignAt = 24+bib[0].maxoffset*120;
+			bibStyle.firstLineIndent = -alignAt;
+			if(bib[0]['second-field-align'] == 'margin') {
+				bibStyle.tabStops = [0];
+			} else {
+				bibStyle.indent = alignAt;
+				bibStyle.tabStops = [alignAt];
+			}
+		}
+
+		return bibStyle;
+};
+
+export { formatBib, formatBibLegacy, formatFallback, getBibliographyFormatParameters, getBibliographyFormatParametersLegacy };

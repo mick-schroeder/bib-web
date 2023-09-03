@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.section {@apply tw-p-4 tw-my-4 tw-bg-white tw-border tw-border-solid tw-border-gray-200 tw-rounded-lg tw-shadow-sm dark:tw-border-gray-700 sm:tw-p-6 dark:tw-bg-gray-800}

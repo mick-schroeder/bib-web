@@ -1,49 +1,39 @@
 <!doctype html>
 <html lang="en">
-
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<title>Mick Schroeder's Citation and Filename Generator</title>
-	<meta name="title" content="📑 Mick Schroeder's Citation and Filename Generator">
-	<meta name="description"
-		content="📑 Mick Schroeder’s automatic citation, bibliography and .PDF filename generator. Just enter a 🌐 URL, 📘 PubMed ID, 🆔 DOI, 📚 ISBN, or others… 🔥 Style with AMA, APA, APA, NLM, + 9000 more. 🔥 Skip the paywall. Find free, full-text PDF.">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="https://cite.mickschroeder.com">
-	<meta property="og:image" content="https://cite.mickschroeder.com/static/images/schroeder-cite-card.png">
-	<meta property="twitter:card" content="summary_large_image">
-	<meta property="twitter:url" content="https://cite.mickschroeder.com">
-	<meta name="twitter:creator" content="@mick_schroeder">
-	<meta name="twitter:image" content="https://cite.mickschroeder.com/static/images/schroeder-cite-card.png">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="manifest" href="/static/site.webmanifest">
-	<meta name="theme-color" content="#1e50a0">
-	<link rel="stylesheet" type="text/css" href="/static/bib.css">
-	<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
-</head>
+	<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGT0YVP86K"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-<body>
-	<div class="container-fullwidth nav">
-		<div class="container">
-			<nav class="flexbox">
-				<a href="https://mickschroeder.com"><img src="/static/images/mickschroeder.logo_white.png" width="270px"
-						alt="mick schroeder" /></a>
-				<ul class="fullwidth">
-					<li>
-						<a href="https://mickschroeder.com" rel="external">About Mick</a>
-					</li>
-					<li>
-						<a href="https://mickschroeder.com/software" rel="external">Other Projects</a>
-					</li>
-				</ul>
-			</nav>
-		</div>
-	</div>
-	<main id="schroeder-cite"></main>
-	<script id="schroeder-cite-config" type="application/json">
+  gtag('config', 'G-HGT0YVP86K');
+</script>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>Mick Schroeder's Citation Generator</title>
+	<meta name="description" content="Free, accurate citation and bibliography maker for APA, Chicago, Harvard, MLA, and 10,000 other styles. No ads, no downloads, no account required.">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="/static/bib.css">
+	<link rel="stylesheet" type="text/css" href="/static/tailwind.css">
+	<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+	<link rel="preload" href="/static/fonts/36500B_2_0.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/static/fonts/36500B_3_0.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/static/fonts/36500B_4_0.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/static/fonts/36500B_5_0.woff2" as="font" type="font/woff2" crossorigin>
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6344797609391119"
+     crossorigin="anonymous"></script>
+</head>
+<body class="tw-antialiased tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white">
+	<!-- Nav -->
+	{{> nav}}
+    <!-- Sidebar -->
+	{{> sidebar}}
+
+	<main class="tw-p-4 md:tw-ml-64 tw-h-auto tw-pt-20" id="zotero-bib"></main>
+	<script id="zotero-bib-config" type="application/json">
 		{{{json indexConfig}}}
 	</script>
 	<script src="/static/main.js"></script>
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </body>
-
 </html>

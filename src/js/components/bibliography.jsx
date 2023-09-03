@@ -1,244 +1,372 @@
-'use strict';
+import cx from 'classnames';
+import PropTypes from 'prop-types';
+import { Fragment, useCallback, useRef, useState, memo } from 'react';
+import { useIntl, FormattedMessage } from 'react-intl';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Icon } from 'web-common/components';
+import { isTriggerEvent, pick } from 'web-common/utils';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const cx = require('classnames');
-const { withRouter } = require('react-router-dom');
-const KeyHandler = require('react-key-handler').default;
-const { KEYDOWN } = require('react-key-handler');
-const Dropdown = require('reactstrap/lib/Dropdown').default;
-const DropdownToggle = require('reactstrap/lib/DropdownToggle').default;
-const DropdownMenu = require('reactstrap/lib/DropdownMenu').default;
-const DropdownItem = require('reactstrap/lib/DropdownItem').default;
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const Icon = require('zotero-web-library/src/js/component/ui/icon');
+import { useDnd } from '../hooks';
 
-const { getHtmlNodeFromBibliography, makeBibliographyContentIterator } =require('../utils') ;
+const BIB_ITEM = 'BIB_ITEM';
 
-class Bibliography extends React.PureComponent {
-	state = {
-		clipboardConfirmations: [],
-		dropdownsOpen: [],
-		focusedItem: null
-	}
+const BibliographyItem = memo(props => {
+	const { allowReorder, copySingleState, isDropdownOpen, formattedItem, isFirst, isLast,
+		isNoteStyle, isNumericStyle, onCopyCitationDialogOpen, onCopySingle, onDeleteCitation,
+		onDelayedCloseDropdown, onEditCitationClick, onReorderCitations, onSelectCitation, onToggleDropdown,
+		rawItem
+	} = props;
+	const containerRef = useRef(null);
+	const intl = useIntl();
+	const isCopied = copySingleState.copied && copySingleState.citationKey === rawItem.key;
 
-	constructor(props) {
-		super(props);
-		this.timeouts = {};
-	}
+	const onComplete = useCallback((targetNode, above, current) => {
+		const targetKey = targetNode.closest('[data-key]').dataset.key;
 
-	componentWillUnmount() {
-		Object.values(this.timeouts).forEach(t => clearTimeout(t));
-		this.timeouts = {};
-	}
+		onReorderCitations(current.key, targetKey, above);
+	}, [onReorderCitations]);
 
-	handleEditCitation(itemId, ev) {
-		let selection = window.getSelection();
-		if(selection.toString().length) {
-			try {
-				if(ev.target.closest('.citation') === selection.anchorNode.parentNode.closest('.citation')) {
-					return;
-				}
-			} catch(_) {
-				// selection.anchorNode.parentNode might fail in which case we open the editor
-			}
-		}
-		if(!this.props.isReadOnly) {
-			this.props.onEditorOpen(itemId);
-		}
-	}
-
-	handleDeleteCitation(itemId, ev) {
+	const handleMoveTop = useCallback(ev => {
 		ev.stopPropagation();
-		this.props.onDeleteEntry(itemId);
-	}
-
-	handleFocus(itemId) {
-		this.setState({
-			focusedItem: itemId
-		});
-	}
-
-	handleKeyboard(ev) {
-		if(document.activeElement.className == 'citation' && this.state.focusedItem) {
-			this.props.onEditorOpen(this.state.focusedItem);
-			ev.preventDefault();
-		}
-	}
-
-	handleToggleDropdown(itemId, ev) {
-		const isOpen = this.state.dropdownsOpen.includes(itemId);
-		const dropdownsOpen = isOpen ?
-			this.state.dropdownsOpen.filter(i => i !== itemId) :
-			[ ...this.state.dropdownsOpen, itemId];
-
-		this.setState({ dropdownsOpen });
-		ev.preventDefault();
+		const srcNode = ev.currentTarget.closest('[data-key]');
+		const topNode = srcNode.parentNode.querySelector('[data-key]:first-child');
+		onReorderCitations(srcNode.dataset.key, topNode.dataset.key, true);
+	}, [onReorderCitations]);
+	const handleMoveUp = useCallback(ev => {
 		ev.stopPropagation();
-	}
+		const srcNode = ev.currentTarget.closest('[data-key]');
+		const prevNode = srcNode.previousElementSibling;
+		onReorderCitations(srcNode.dataset.key, prevNode.dataset.key, true);
+	}, [onReorderCitations]);
+	const handleMovedown = useCallback(ev => {
+		ev.stopPropagation();
+		const srcNode = ev.currentTarget.closest('[data-key]');
+		const nextNode = srcNode.nextElementSibling;
+		onReorderCitations(srcNode.dataset.key, nextNode.dataset.key, false);
+	}, [onReorderCitations]);
 
-	handleCopyCitationDialogOpen(itemId, ev) {
+	const handleCopySingleClick = useCallback(ev => {
 		ev.stopPropagation();
 		ev.preventDefault();
-		this.props.onCitationCopyDialogOpen(itemId);
-	}
+		onDelayedCloseDropdown();
+		onCopySingle(ev.currentTarget.closest('[data-key]')?.dataset.key);
+	}, [onCopySingle, onDelayedCloseDropdown])
 
-	get keyHandlers() {
-		return [
-			<KeyHandler
-				key="key-handler-enter"
-				keyEventName={ KEYDOWN }
-				keyValue="Enter"
-				onKeyHandle={ this.handleKeyboard.bind(this) }
-			/>,
-			<KeyHandler
-				key="key-handler-space"
-				keyEventName={ KEYDOWN }
-				keyValue=" "
-				onKeyHandle={ this.handleKeyboard.bind(this) }
-			/>,
-		];
-	}
+	const getData = useCallback(
+		ev => ({ key: ev.currentTarget.closest('[data-key]').dataset.key }), []
+	);
 
-	renderBibliographyItem(rawItem, content) {
-		return (
-			<li key={ rawItem.key }
-				className="citation"
-				onFocus={ this.handleFocus.bind(this, rawItem.key) }
-				onClick={ ev => this.handleEditCitation(rawItem.key, ev) }
-				tabIndex={ 0 }
-			>
-				<div className="csl-entry-container">
-					{ content }
-				</div>
+	const { onDrag, onHover, onDrop } = useDnd({
+		type: BIB_ITEM,
+		data: getData,
+		ref: containerRef,
+		ghostContainerSelector: '.zotero-bib-container',
+		midpointOffset: 12,
+		onComplete,
+	});
+
+	const copyText = isNoteStyle ?
+		intl.formatMessage({ id: 'zbib.citation.copyNote', defaultMessage: 'Copy Note' }) :
+		intl.formatMessage({ id: 'zbib.citation.copyCitation', defaultMessage: 'Copy Citation' });
+
+	return (
+        <li
+			aria-label="Citation"
+			key={rawItem.key}
+			data-dnd-candidate
+			data-key={rawItem.key}
+			className="citation-container"
+			onClick={onSelectCitation}
+			tabIndex={0}
+			onKeyDown={onSelectCitation}
+			onMouseOver={onHover}
+			onMouseOut={onHover}
+			onMouseMove={onHover}
+			onMouseUp={onDrop}
+		>
+			<div className="citation" ref={containerRef}>
+				{allowReorder && (
+					<div className="drag-handle" onMouseDown={onDrag} onTouchStart={onDrag}>
+						<Icon type="24/grip" width="24" height="24" />
+					</div>
+				)}
+				<div
+					data-container-key={rawItem.key}
+					className="csl-entry-container"
+					dangerouslySetInnerHTML={{ __html: formattedItem }}
+				/>
+				{!isNumericStyle && (
+					<Fragment>
+					<Button
+						icon
+						title={copyText}
+						className={cx('d-xs-none d-md-block btn-outline-secondary btn-copy')}
+						onClick={onCopyCitationDialogOpen}
+					>
+						<Icon type={'16/quote'} width="16" height="16" />
+					</Button>
+					<Button
+						icon
+						title={intl.formatMessage({ id: 'zbib.citation.copyBibliographyEntry', defaultMessage: 'Copy Bibliography Entry' })}
+						disabled={copySingleState.citationKey === rawItem.key}
+						className={cx('d-xs-none d-md-block btn-outline-secondary btn-copy',
+							{ 'success': isCopied }
+						)}
+						onClick={handleCopySingleClick}
+					>
+						<Icon type={isCopied ? '16/tick' : '16/copy'} width="16" height="16" />
+					</Button>
+					</Fragment>
+				)}
 				<Dropdown
-					isOpen={ this.state.dropdownsOpen.includes(rawItem.key) }
-					toggle={ this.handleToggleDropdown.bind(this, rawItem.key) }
-					className="d-md-none"
+					isOpen={isDropdownOpen}
+					onToggle={onToggleDropdown}
+					className="citation-options-menu"
 				>
 					<DropdownToggle
-						color={ null }
+						color={null}
 						className="btn-icon dropdown-toggle"
+						title="Options"
 					>
-						<Icon type={ '28/dots' } width="28" height="28" />
+						<Icon type={'28/dots'} width="28" height="28" />
 					</DropdownToggle>
-					<DropdownMenu right className="dropdown-menu">
-						{ !this.props.isNumericStyle && (
+					<DropdownMenu aria-label="Options" right>
+						{!isNumericStyle && (
+							<Fragment>
 							<DropdownItem
-								onClick={ this.handleCopyCitationDialogOpen.bind(this, rawItem.key) }
+								onClick={onCopyCitationDialogOpen}
 								className="btn"
 							>
-								<span className={ cx('inline-feedback', {
-									'active': this.state.clipboardConfirmations.includes(rawItem.key)
-								}) }>
-									<span
-									className="default-text"
-									aria-hidden={ !this.state.clipboardConfirmations.includes(rawItem.key) }>
-										{this.props.isNoteStyle ? 'Copy Note' : 'Copy Citation'}
+								{copyText}
+							</DropdownItem>
+							<DropdownItem
+								onClick={handleCopySingleClick}
+								className={cx('btn clipboard-trigger', { success: isCopied })}
+							>
+								<span className={cx('inline-feedback', { 'active': isCopied })}>
+									<span className="default-text" aria-hidden={isCopied}>
+										<FormattedMessage id="zbib.citation.copyBibliographyEntry" defaultMessage="Copy Bibliography Entry" />
 									</span>
-									<span
-									className="shorter feedback"
-									aria-hidden={ this.state.clipboardConfirmations.includes(rawItem.key) }>
-										Copied!
+									<span className="shorter feedback" aria-hidden={!isCopied}>
+										<FormattedMessage id="zbib.export.copiedFeedback" defaultMessage="Copied!" />
 									</span>
 								</span>
 							</DropdownItem>
-						) }
+							</Fragment>
+						)}
 						<DropdownItem
-							onClick={ this.handleEditCitation.bind(this, rawItem.key) }
+							onClick={onEditCitationClick}
 							className="btn"
 						>
-							Edit
+							<FormattedMessage id="zbib.general.edit" defaultMessage="Edit" />
 						</DropdownItem>
 						<DropdownItem
-							onClick={ this.handleDeleteCitation.bind(this, rawItem.key) }
+							onClick={onDeleteCitation}
 							className="btn"
 						>
-							Delete
+							<FormattedMessage id="zbib.general.delete" defaultMessage="Delete" />
 						</DropdownItem>
+						{allowReorder && (
+							<Fragment>
+								<DropdownItem divider />
+								{!isFirst && (
+									<DropdownItem onClick={handleMoveTop} className="btn">
+										<FormattedMessage id="zbib.citation.moveToTop" defaultMessage="Move to Top" />
+									</DropdownItem>)}
+								{!isFirst && (
+									<DropdownItem onClick={handleMoveUp} className="btn">
+										<FormattedMessage id="zbib.citation.moveUp" defaultMessage="Move Up" />
+									</DropdownItem>)}
+								{!isLast && (
+									<DropdownItem onClick={handleMovedown} className="btn">
+										<FormattedMessage id="zbib.citation.moveDown" defaultMessage="Move Down" />
+									</DropdownItem>)}
+							</Fragment>
+						)}
 					</DropdownMenu>
 				</Dropdown>
-				{ !this.props.isNumericStyle && (
-					<Button
-						title={this.props.isNoteStyle ? 'Copy Note' : 'Copy Citation'}
-						className={ cx('d-xs-none d-md-block btn-outline-secondary btn-copy', { success: this.state.clipboardConfirmations.includes(rawItem.key) })}
-						onClick={ this.handleCopyCitationDialogOpen.bind(this, rawItem.key) }
-					>
-						<Icon type={ '16/copy' } width="16" height="16" />
-					</Button>
-				) }
 				<Button
-					title="Delete Entry"
+					icon
+					title={ intl.formatMessage({ id: 'zbib.citation.deleteEntry', defaultMessage: 'Delete Entry' }) }
 					className="btn-outline-secondary btn-remove"
-					onClick={ this.handleDeleteCitation.bind(this, rawItem.key) }
+					onClick={onDeleteCitation}
 				>
-					<Icon type={ '16/remove-sm' } width="16" height="16" />
+					<Icon type={'16/remove-sm'} width="16" height="16" />
 				</Button>
 				<script type="application/vnd.zotero.data+json">
-					{ JSON.stringify(rawItem) }
+					{JSON.stringify(rawItem)}
 				</script>
-			</li>
-		);
-	}
+			</div>
+		</li>
+    );
+});
 
-	render() {
-		const { bibliography } = this.props;
-		if(bibliography.items.length === 0) {
-			return null;
-		}
+BibliographyItem.displayName = 'BibliographyItem';
 
-		const div = getHtmlNodeFromBibliography(bibliography);
-
-		if(this.props.isReadOnly) {
-			return (
-				<React.Fragment>
-					{ this.keyHandlers }
-					<div className="bibliography read-only"
-						dangerouslySetInnerHTML={ { __html: div.innerHTML } }
-					/>
-					{bibliography.items.map(rawItem => (
-						<script key={ rawItem.key } type="application/vnd.zotero.data+json">
-							{ JSON.stringify(rawItem) }
-						</script>
-					))}
-				</React.Fragment>
-			);
-		} else {
-			const bibliographyContentIterator = makeBibliographyContentIterator(
-				bibliography, div
-			);
-			const bibliographyProcessedContent = [];
-			for(var [item, content] of bibliographyContentIterator) {
-				bibliographyProcessedContent.push(
-					this.renderBibliographyItem(item, content)
-				);
-			}
-
-			return [
-				...this.keyHandlers,
-				<ul className="bibliography" key="bibliography">
-					{ bibliographyProcessedContent }
-				</ul>
-			];
-		}
-	}
-
-	static defaultProps = {
-		bibliography: []
-	}
-
-	static propTypes = {
-		bibliography: PropTypes.object,
-		isNoteStyle: PropTypes.bool,
-		isNumericStyle: PropTypes.bool,
-		isReadOnly: PropTypes.bool,
-		items: PropTypes.array,
-		match: PropTypes.object,
-		onCitationCopyDialogOpen:  PropTypes.func.isRequired,
-		onDeleteEntry: PropTypes.func.isRequired,
-		onEditorOpen:  PropTypes.func.isRequired,
-	}
+BibliographyItem.propTypes = {
+	isDropdownOpen: PropTypes.bool,
+	onDelayedCloseDropdown: PropTypes.func,
+	allowReorder: PropTypes.bool,
+	copySingleState: PropTypes.object,
+	dropdownsOpen: PropTypes.array,
+	formattedItem: PropTypes.string,
+	isFirst: PropTypes.bool,
+	isLast: PropTypes.bool,
+	isNoteStyle: PropTypes.bool,
+	isNumericStyle: PropTypes.bool,
+	onCopyCitationDialogOpen: PropTypes.func,
+	onCopySingle: PropTypes.func,
+	onDeleteCitation: PropTypes.func,
+	onEditCitationClick: PropTypes.func,
+	onReorderCitations: PropTypes.func,
+	onSelectCitation: PropTypes.func,
+	onToggleDropdown: PropTypes.func,
+	rawItem: PropTypes.object,
 }
 
+const Bibliography = props => {
+	const dropdownTimer = useRef(null);
+	const [dropdownOpen, setDropdownOpen] = useState(null);
 
-module.exports = withRouter(Bibliography);
+	const {
+		bibliography, bibliographyRendered, bibliographyRenderedNodes,
+		isReadOnly, isSortedStyle, onCitationCopyDialogOpen, onDeleteEntry,
+		onEditorOpen, styleHasBibliography,
+	} = props;
+
+	const handleSelectCitation = useCallback((ev) => {
+		const itemId = ev.currentTarget.closest('[data-key]').dataset.key;
+		const selection = window.getSelection();
+
+		// ignore keydown events on buttons
+		if (ev.type === 'keydown' && ev.currentTarget !== ev.target) {
+			return;
+		}
+
+		// ignore click event fired when selecting text
+		if (ev.type === 'click' && selection.toString().length) {
+			try {
+				if (ev.target.closest('.citation') === selection.anchorNode.parentNode.closest('.citation')) {
+					return;
+				}
+			} catch (_) {
+				// selection.anchorNode.parentNode might fail in which case we open the editor
+			}
+		}
+		if (!isReadOnly && itemId && isTriggerEvent(ev)) {
+			onEditorOpen(itemId);
+		}
+	}, [isReadOnly, onEditorOpen]);
+
+	const handleEditCitationClick = useCallback((ev) => {
+		ev.stopPropagation();
+		ev.preventDefault();
+		setDropdownOpen(null);
+		const itemId = ev.currentTarget.closest('[data-key]').dataset.key;
+		onEditorOpen(itemId);
+	}, [onEditorOpen]);
+
+	const handleDeleteCitation = useCallback(ev => {
+		ev.stopPropagation();
+		onDeleteEntry(ev.currentTarget.closest('[data-key]').dataset.key);
+	}, [onDeleteEntry]);
+
+
+	const handleToggleDropdown = useCallback(ev => {
+		ev.stopPropagation();
+		clearTimeout(dropdownTimer.current);
+		const itemId = ev.currentTarget?.closest?.('[data-key]')?.dataset.key;
+
+		if(!itemId) {
+			setDropdownOpen(null);
+			return;
+		}
+
+		const isDropdownOpen = dropdownOpen ===  itemId;
+		setDropdownOpen(isDropdownOpen ? null : itemId);
+	}, [dropdownOpen]);
+
+	const handleDelayedCloseDropdown = useCallback(() => {
+		clearTimeout(dropdownTimer.current);
+		dropdownTimer.current = setTimeout(() => {
+			setDropdownOpen(null);
+		}, 950);
+	}, []);
+
+	const handleCopyCitationDialogOpen = useCallback(ev => {
+		ev.stopPropagation();
+		onCitationCopyDialogOpen(ev.currentTarget.closest('[data-key]').dataset.key);
+	}, [onCitationCopyDialogOpen]);
+
+
+	if (bibliography.items.length === 0) {
+		return null;
+	}
+
+	return (
+        <Fragment>
+			{isReadOnly ? (
+				<Fragment>
+					<div
+						suppressHydrationWarning={true}
+						className="bibliography read-only"
+						dangerouslySetInnerHTML={{ __html: bibliographyRendered }}
+					/>
+					{bibliography.items.map(renderedItem => (
+						<script
+							suppressHydrationWarning={true}
+							key={renderedItem.id}
+							type="application/vnd.zotero.data+json">
+							{JSON.stringify(bibliography.lookup[renderedItem.id])}
+						</script>
+					))}
+				</Fragment>
+			) : (
+				<ul
+					aria-label="Bibliography"
+					className="bibliography"
+					key="bibliography"
+				>
+					{bibliography.items.map((renderedItem, index) => (
+						<BibliographyItem
+							{...pick(props, ['copySingleState', 'isNoteStyle', 'isNumericStyle',
+								'onCopySingle', 'onReorderCitations']) }
+							isDropdownOpen={ dropdownOpen === renderedItem.id }
+							formattedItem={bibliographyRenderedNodes?.[index]?.innerHTML || renderedItem.value}
+							key={renderedItem.id}
+							onCopyCitationDialogOpen={handleCopyCitationDialogOpen}
+							onDeleteCitation={handleDeleteCitation}
+							onEditCitationClick={handleEditCitationClick}
+							onSelectCitation={handleSelectCitation}
+							onToggleDropdown={handleToggleDropdown}
+							onDelayedCloseDropdown={ handleDelayedCloseDropdown }
+							rawItem={bibliography.lookup[renderedItem.id]}
+							allowReorder={(!styleHasBibliography || !isSortedStyle) && bibliography.items.length > 1}
+							isFirst={index === 0}
+							isLast={index === bibliography.items.length - 1}
+						/>
+					))}
+				</ul>
+			)}
+		</Fragment>
+    );
+}
+
+Bibliography.propTypes = {
+	bibliography: PropTypes.object,
+	bibliographyRendered: PropTypes.string,
+	bibliographyRenderedNodes: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.instanceOf(HTMLCollection)
+	]),
+	isNoteStyle: PropTypes.bool,
+	isNumericStyle: PropTypes.bool,
+	isReadOnly: PropTypes.bool,
+	isSortedStyle: PropTypes.bool,
+	onCitationCopyDialogOpen: PropTypes.func,
+	onDeleteEntry: PropTypes.func,
+	onEditorOpen: PropTypes.func,
+	onReorderCitations: PropTypes.func,
+	styleHasBibliography: PropTypes.bool,
+}
+
+export default memo(Bibliography);

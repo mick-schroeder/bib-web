@@ -13,7 +13,7 @@ li[tabindex] {
 		outline: none;
 		outline-offset: $outline-offset;
 
-		.keyboard-user & {
+		.keyboard & {
 			outline: $outline-width solid $outline-color;
 		}
 	}
@@ -33,7 +33,7 @@ li[tabindex] {
 html,
 body,
 main,
-.schroeder-bib-container {
+.zotero-bib-container {
 	height: 100%; // Stretch for spinner
 }
 
@@ -43,15 +43,15 @@ body {
 	background-color: $body-bg;
 }
 
-.schroeder-bib-container {
+.zotero-bib-container {
 	&.loading {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 
 		.icon-spin {
-			width: $schroeder-cite-spinner-size;
-			height: $schroeder-cite-spinner-size;
+			width: $zotero-bib-spinner-size;
+			height: $zotero-bib-spinner-size;
 		}
 	}
 }

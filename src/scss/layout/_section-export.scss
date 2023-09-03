@@ -4,14 +4,16 @@
 
 .section-export {
 	text-align: center;
-	h2 {
-		font-weight: 800;
+
+	@media print {
+		display: none;
 	}
+
 	.write & {
-		padding-top: $section-padding-mobile; // t height
+		padding-top: $section-padding-mobile - 10px; // t height
 
 		@media (min-width: $bp-md) {
-			padding-top: $section-padding; // t height
+			padding-top: $section-padding - 12px; // t height
 		}
 	}
 

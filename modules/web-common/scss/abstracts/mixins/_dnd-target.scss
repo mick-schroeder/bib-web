@@ -1,0 +1,9 @@
+@mixin dnd-target {
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background-color: $dnd-target-color;
+		z-index: 999999;
+	}
+}

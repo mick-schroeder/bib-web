@@ -1,10 +1,15 @@
-//
-// Multiple choice dialog
-//
+.multiple-choice-dialog,
+.confirm-add-dialog {
+	.tab {
+		max-width: 50%;
+	}
 
-.multiple-choice-dialog {
+	.tab-pane {
+		padding: 1em 0;
+	}
+
 	.results {
-		margin: 0 -$modal-inner-padding-mobile;
+		margin: 0 - $modal-inner-padding-mobile;
 		padding: 0;
 		list-style: none;
 
@@ -17,6 +22,8 @@
 		border-top: 1px solid $result-border-color;
 		padding: $result-padding;
 		cursor: pointer;
+		display: flex;
+		justify-content: space-between;
 
 		&:hover {
 			background-color: $result-hover-bg;
@@ -28,7 +35,7 @@
 		}
 
 		&:focus {
-			.keyboard-user & {
+			.keyboard & {
 				outline-offset: -3px;
 
 				& + .result {
@@ -54,11 +61,19 @@
 		}
 
 		.title-container {
-			margin-right: $space-min + $space-min / 2;
+			margin-right: $space-min + $space-min * 0.5;
 		}
 
 		.description {
 			margin: 0;
+		}
+
+		.checkbox {
+			align-self: center;
+		}
+
+		.csl-entry {
+			word-break: break-word;
 		}
 	}
 

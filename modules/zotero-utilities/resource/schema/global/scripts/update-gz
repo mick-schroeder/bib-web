@@ -1,0 +1,19 @@
+#!/bin/bash
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $dir/..
+
+file=schema.json.gz
+tmp_file=$file-tmp
+
+gzip -c schema.json > $tmp_file
+
+DIFF=$(diff $file $tmp_file) 
+if [ "$DIFF" != "" ]
+then
+	echo "$file updated"
+	mv $tmp_file $file
+else
+	echo "Schema hasn't changed"
+	rm $tmp_file
+fi

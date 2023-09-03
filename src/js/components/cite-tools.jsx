@@ -1,37 +1,104 @@
-'use strict';
+import { useCallback, useEffect, useRef, useState, memo } from 'react';
+import PropTypes from 'prop-types';
+import { useIntl, FormattedMessage } from 'react-intl';
+import { Button } from 'web-common/components';
+import { usePrevious } from 'web-common/hooks';
 
-const React = require('react');
-const PropTypes = require('prop-types');
+import Input from './form/input';
 
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const IdInput = require('./id-input');
+const canCancel = typeof(AbortController) === 'function';
 
-class CiteTools extends React.PureComponent {
-	render() {
-		return (
-			<div className="cite-tools">
-				<h3>Enter query</h3>
-				<Button onClick={ () => { this.props.onEditorOpen(); } }
-					className="btn-sm btn-outline-light"
-				>
-					Add a Manual Entry
-				</Button>
-				<IdInput
-					identifier={ this.props.identifier }
-					isTranslating={ this.props.isTranslating }
-					onTranslationRequest={ this.props.onTranslationRequest }
+const CiteTools = ({ identifier, isTranslating, onEditorOpen, onTranslationCancel, onTranslationRequest }) => {
+	const inputRef = useRef(null);
+	const [entry, setEntry] = useState(identifier);
+	const prevIdentifier = usePrevious(identifier);
+	const wasTranslating = usePrevious(isTranslating)
+	const intl = useIntl();
+	const prompt = intl.formatMessage({ id: 'zbib.citePrompt', defaultMessage: 'Enter a URL, ISBN, DOI, PMID, arXiv ID, or title' });
+
+	const handleChange = useCallback(newValue => {
+		setEntry(newValue);
+	}, []);
+
+	const handleCiteOrCancel = useCallback(() => {
+		if(isTranslating) {
+			onTranslationCancel();
+		} else if(entry.length > 0 && !isTranslating) {
+			onTranslationRequest(entry);
+		}
+	}, [entry, isTranslating, onTranslationCancel, onTranslationRequest]);
+
+	const handlePaste = useCallback((ev) => {
+		const clipboardData = ev.clipboardData || window.clipboardData;
+		const pastedData = clipboardData.getData('Text');
+
+		if(!pastedData.includes('\n')) {
+			return;
+		}
+
+		ev.preventDefault();
+		setEntry(pastedData);
+		onTranslationRequest(pastedData, null, false, true);
+
+	}, [onTranslationRequest]);
+
+	useEffect(() => {
+		if(typeof(prevIdentifier !== 'undefined') && identifier !== prevIdentifier) {
+			setEntry(identifier);
+		}
+	}, [identifier, prevIdentifier]);
+
+	useEffect(() => {
+		if(wasTranslating && !isTranslating) {
+			inputRef.current.focus();
+		}
+	}, [isTranslating, wasTranslating]);
+
+	return (
+		<div className="cite-tools">
+			<div className="id-input-container">
+				<Input
+					aria-label={ prompt }
+					autoFocus
+					className="form-control form-control-lg id-input"
+					isBusy={ isTranslating }
+					isReadOnly={ isTranslating }
+					onBlur={ () => true /* do not commit on blur */ }
+					onChange={ handleChange }
+					onCommit={ handleCiteOrCancel }
+					onPaste={ handlePaste }
+					placeholder={ prompt }
+					ref = { inputRef }
+					tabIndex={ 0 }
+					type="search"
+					value={ entry }
 				/>
-
+				<Button
+					className="btn-lg btn-secondary"
+					onClick={ handleCiteOrCancel }
+				>
+					{ (isTranslating && canCancel) ?
+						<FormattedMessage id="zbib.general.cancel" defaultMessage="Cancel" /> :
+						<FormattedMessage id="zbib.general.cite" defaultMessage="Cite" />
+					}
+				</Button>
 			</div>
-		);
-	}
-
-	static propTypes = {
-		isTranslating: PropTypes.bool,
-		onEditorOpen: PropTypes.func.isRequired,
-		onTranslationRequest: PropTypes.func.isRequired,
-		identifier: PropTypes.string,
-	}
+			<Button onClick={ onEditorOpen }
+				className="btn-sm btn-outline-secondary"
+			>
+				<FormattedMessage id="zbib.manualEntry" defaultMessage="Manual Entry" />
+			</Button>
+		</div>
+	);
 }
 
-module.exports = CiteTools;
+CiteTools.propTypes = {
+	identifier: PropTypes.string,
+	isTranslating: PropTypes.bool,
+	onEditorOpen: PropTypes.func.isRequired,
+	onTranslationCancel: PropTypes.func.isRequired,
+	onTranslationRequest: PropTypes.func.isRequired,
+}
+
+
+export default memo(CiteTools);

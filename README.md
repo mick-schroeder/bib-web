@@ -19,7 +19,7 @@ Local Development version
 
 Getting The Library
 
-1. `git clone --recursive git@github.com:mick-schroeder/schroeder-cite.git`
+1. `git clone --recursive https://github.com/mick-schroeder/schroeder-cite.git`
 
 1. `cd schroeder-cite`
 
@@ -33,7 +33,7 @@ You might need to provide configuration options (see below) in order to get stor
 
 By default, the development server **proxies translations server requests to localhost:1969**. If your server is located elsewhere you need to provide the url, e.g. the last step above would look like this:
 
-1. `npm start --zotero-bib-web:translation_server="http://localhost:1234"`
+1. `TRANSLATE_URL=http://localhost:1234 npm start`
 
 This will proxy requests from the browser to the specified translation server.
 
@@ -65,3 +65,20 @@ Specifies an additional prefix for where translation server request should be se
 
 **translateURL**
 Specifies url for the *translation-server*. By default current host is assumed to proxy request to the translation server.
+
+**apiAuthorityPart**
+Specifies the authority part of the URL for Zotero API requests. Defaults to `api.zotero.org`.
+
+Development server configuration
+--------------
+
+Running `npm start` checks for the following environment variables:
+
+**TRANSLATE_URL**
+Where to proxy translation requests, defaults to http://localhost:1969. By default ZoteroBib will send translation requests to `window.location.origin` and dev server should be configured to proxy these requests to a translation server.
+
+**PORT**
+On which port should the dev server listen, defaults to 8001.
+
+**NO_HYDRATE**
+When accessing a remote bibliography, ZoteroBib can hydrate from pre-rendered HTML to avoid a spinner while loading. For development purposes, a hard-coded bibliography is stored in `hydrate.hbs` and is used to serve any request that includes a remote bibliography ID. To disable this behavior, set `NO_HYDRATE` to `1`, which will serve `index.hbs` instead, meaning the bibliography is always rendered client-side with a spinner.

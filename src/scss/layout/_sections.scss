@@ -4,29 +4,13 @@
 
 .section {
 	padding: $section-padding-mobile 0;
-	margin: $space-sm 0;
+	border-top: 1px solid $shade-2;
+
 	@media (min-width: $bp-md) {
-		padding: $section-padding 0.5em;
-		margin: $space-md 0.5em;
-		//min-width: 600px;
+		padding: $section-padding 0;
 	}
 
 	.review + & {
 		border-top-color: $review-border-color;
 	}
 }
-
-.section-rounded {
-    background-color: #fff;
-	border-radius: 1rem;
-	transition: all 250ms ease 0s;
-	box-shadow: rgba(1, 1, 1, 0.05) 1px 1px 5px 0px;
-}
-
-.section-rounded:hover {
-	box-shadow: rgba(1, 1, 1, 0.1) 1px 1px 5px 0px;
-}
-
-
-
-

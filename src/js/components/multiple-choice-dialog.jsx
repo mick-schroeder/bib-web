@@ -1,155 +1,142 @@
-'use strict';
+import PropTypes from 'prop-types';
+import { useCallback, useId, memo } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Button, Icon, Spinner } from 'web-common/components';
+import { isTriggerEvent } from 'web-common/utils';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const KeyHandler = require('react-key-handler').default;
-const { KEYDOWN } = require('react-key-handler');
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const Spinner = require('zotero-web-library/src/js/component/ui/spinner');
-const Modal = require('./modal');
-const Icon = require('zotero-web-library/src/js/component/ui/icon');
+import Modal from './modal';
 
-class MultipleChoiceDialog extends React.Component {
-	handleSelect(item = this.focusedItem) {
-		if(item) {
-			this.props.onMultipleChoiceSelect(item);
+const ChoiceItem = memo(({ item, onItemSelect }) => {
+	const id = useId();
+	let badge = null;
+	let title = item.value.title || '';
+
+	if(item.source === 'url') {
+		let badges = [];
+		let matches = title.match(/^\[([A-Z]*)\]/);
+		while(matches) {
+			const badge = matches[1]
+				.split(' ')
+				.map(w => w.substring(0, 1).toUpperCase() + w.substring(1).toLowerCase())
+				.join(' ');
+			badges.push(badge);
+			title = title.substring(matches[0].length);
+			matches = title.match(/^\[([A-Z]*)\]/);
 		}
-	}
-
-	handleFocus(item) {
-		this.focusedItem = item;
-	}
-
-	handleCancel() {
-		this.props.onMultipleChoiceCancel();
-	}
-
-	handleMore() {
-		this.props.onMultipleChoiceMore();
-	}
-
-	renderItem(item) {
-		let badge = null;
-		let title = item.value.title;
-		if(item.source === 'url') {
-			let badges = [];
-			let matches = title.match(/^\[([A-Z]*)\]/);
-			while(matches) {
-				let badge = matches[1]
-					.split(' ')
-					.map(w => w.substring(0, 1).toUpperCase() + w.substring(1).toLowerCase())
-					.join(' ');
-				badges.push(badge);
-				title = title.substring(matches[0].length);
-				matches = title.match(/^\[([A-Z]*)\]/);
-			}
-			badges = [ ...new Set(badges) ].filter(b => b.length > 1);
-			if(badges.length) {
-				badge = badges[0];
-			}
-		} else if(item.value.itemType) {
-			badge = item.value.itemType;
+		badges = [ ...new Set(badges) ].filter(b => b.length > 1);
+		if(badges.length) {
+			badge = badges[0];
 		}
-		return (
-			<li
-				className="result"
-				key={ item.signature }
-				onFocus={ this.handleFocus.bind(this, item) }
-				onClick={ this.handleSelect.bind(this, item) }
-				tabIndex={ 0 }
-			>
-				{ badge && <span key={badge} className="badge badge-light d-sm-none">{ badge }</span> }
-				<h5 className="title">
-					<span className="title-container">
-						{ title }
-					</span>
-					{ badge && <span key={badge} className="badge badge-light d-xs-none d-sm-inline-block">{ badge }</span> }
-				</h5>
-				{ item.value.description && (
-					<p className="description">
-						{item.value.description}
-					</p>
-				)}
-			</li>
-		);
+	} else if(item.value.itemType) {
+		badge = item.value.itemType;
 	}
 
-	renderMoreSection() {
-		const { isTranslatingMore, moreItemsLink } = this.props;
-		if(isTranslatingMore) {
-			return <Spinner />;
-		} else if(moreItemsLink !== null) {
-			return (
-				<Button
-					className="btn-outline-secondary btn-min-width"
-					onClick={ this.handleMore.bind(this) }
-				>
-					More…
-				</Button>
-			);
-		}
-	}
+	return (
+		<li
+			aria-labelledby={ id }
+			className="result"
+			data-signature={ item.signature }
+			onKeyDown={ onItemSelect }
+			onClick={ onItemSelect }
+			tabIndex={ 0 }
+		>
+			{ badge && <span className="badge badge-light d-sm-none">{ badge }</span> }
+			<h5 id={ id } className="title">
+				<span className="title-container">
+					{ title }
+				</span>
+				{ badge && <span className="badge badge-light d-xs-none d-sm-inline-block">{ badge }</span> }
+			</h5>
+			{ item.value.description && (
+				<p className="description">
+					{item.value.description}
+				</p>
+			)}
+		</li>
+	);
+});
 
-	render() {
-		return (
-			<Modal
-				isOpen={ this.props.isPickingItem }
-				contentLabel="Select the entry to add:"
-				className="multiple-choice-dialog modal modal-lg"
-				onRequestClose={ this.handleCancel.bind(this) }
-			>
-				<KeyHandler
-					keyEventName={ KEYDOWN }
-					keyValue="Escape"
-					onKeyHandle={ this.handleCancel.bind(this) }
-				/>
-				<KeyHandler
-					keyEventName={ KEYDOWN }
-					keyValue="Enter"
-					onKeyHandle={ this.handleSelect.bind(this, undefined) }
-				/>
-				<div className="modal-content" tabIndex={ -1 }>
-					<div className="modal-header">
-						<h4 className="modal-title text-truncate">
-							Please select a citation from the list
-						</h4>
-						<Button
-							className="close"
-							onClick={ this.handleCancel.bind(this) }
-						>
-							<Icon type={ '24/remove' } width="24" height="24" />
-						</Button>
-					</div>
-					<div className="modal-body">
-						<ul className="results">
-							{ this.props.multipleChoiceItems.map(
-								this.renderItem.bind(this)
-							) }
-						</ul>
-						{ this.props.moreItemsLink && (
-							<div className="more-items-action">
-								{ this.renderMoreSection() }
-							</div>
-						)}
-					</div>
-				</div>
-			</Modal>
-		);
-	}
-
-	static defaultProps = {
-		multipleChoiceItems: []
-	}
-
-	static propTypes = {
-		isPickingItem: PropTypes.bool,
-		isTranslatingMore: PropTypes.bool,
-		moreItemsLink: PropTypes.object,
-		multipleChoiceItems: PropTypes.array,
-		onMultipleChoiceCancel: PropTypes.func.isRequired,
-		onMultipleChoiceMore: PropTypes.func.isRequired,
-		onMultipleChoiceSelect: PropTypes.func.isRequired,
-	}
+ChoiceItem.propTypes = {
+	item: PropTypes.object,
+	onItemSelect: PropTypes.func,
 }
 
-module.exports = MultipleChoiceDialog;
+ChoiceItem.displayName = 'ChoiceItem';
+
+const getItem = (ev, items) => items.find(item => item.signature === ev.currentTarget.closest('[data-signature]')?.dataset.signature);
+
+const MultipleChoiceDialog = props => {
+	const { activeDialog, isTranslatingMore, moreItemsLink, multipleChoiceItems,
+	onMultipleChoiceCancel, onMultipleChoiceMore, onMultipleChoiceSelect } = props;
+
+	const handleItemSelect = useCallback(ev => {
+		if(isTriggerEvent(ev)) {
+			const item = getItem(ev, multipleChoiceItems);
+			onMultipleChoiceSelect(item);
+		}
+	}, [multipleChoiceItems, onMultipleChoiceSelect]);
+
+	return (multipleChoiceItems && activeDialog === 'MULTIPLE_CHOICE_DIALOG') ? (
+		<Modal
+			isOpen={ activeDialog === 'MULTIPLE_CHOICE_DIALOG' }
+			contentLabel="Select a Search Result to Add"
+			className="multiple-choice-dialog modal modal-lg"
+			onRequestClose={ onMultipleChoiceCancel }
+		>
+			<div className="modal-content" tabIndex={ -1 }>
+				<div className="modal-header">
+					<h4 className="modal-title text-truncate">
+						<FormattedMessage id="zbib.multipleChoice.prompt" defaultMessage="Please select a citation from the list" />
+					</h4>
+					<Button
+						icon
+						className="close"
+						onClick={ onMultipleChoiceCancel }
+					>
+						<Icon type={ '24/remove' } width="24" height="24" />
+					</Button>
+				</div>
+				<div className="modal-body">
+					<ul
+						aria-label="Results"
+						className="results"
+					>
+						{ multipleChoiceItems.map(item => (
+							<ChoiceItem
+								key={ item.signature }
+								item={ item }
+								onItemSelect={ handleItemSelect }
+							/>
+						)) }
+					</ul>
+					{ moreItemsLink && (
+						<div className="more-items-action">
+							{ isTranslatingMore ? <Spinner /> : (
+								moreItemsLink !== null && (
+									<Button
+										className="btn-outline-secondary btn-min-width"
+										onClick={ onMultipleChoiceMore }
+									>
+										<FormattedMessage id="zbib.multipleChoice.more" defaultMessage="More…" />
+									</Button>
+								)
+							) }
+						</div>
+					) }
+				</div>
+			</div>
+		</Modal>
+	) : null;
+}
+
+MultipleChoiceDialog.propTypes = {
+	activeDialog: PropTypes.string,
+	isTranslatingMore: PropTypes.bool,
+	moreItemsLink: PropTypes.string,
+	multipleChoiceItems: PropTypes.array,
+	onMultipleChoiceCancel: PropTypes.func.isRequired,
+	onMultipleChoiceMore: PropTypes.func.isRequired,
+	onMultipleChoiceSelect: PropTypes.func.isRequired,
+}
+
+export default memo(MultipleChoiceDialog);

@@ -1,63 +1,66 @@
-'use strict';
+import { Fragment, memo, useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Button } from 'web-common/components';
 
-const React = require('react');
-const PropTypes = require('prop-types');
+import Confirmation from './confirmation';
 
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const Confirmation = require('./confirmation');
+const DeleteAllButton = props => {
+	const { bibliographyCount, onDeleteCitations } = props;
+	const [isConfirmingDeleteAll, setIsConfirmingDeleteAll] = useState(false);
+	const intl = useIntl();
 
-class DeleteAllButton extends React.Component {
-	state = {
-		isConfirmingDeleteAll: false
-	}
+	const handleDeleteAll = useCallback(() => {
+		setIsConfirmingDeleteAll(true);
+	}, []);
 
-	handleDeleteAll() {
-		this.setState({ isConfirmingDeleteAll: true });
-	}
+	const handleConfirmDeleteAll = useCallback(() => {
+		setIsConfirmingDeleteAll(false);
+		onDeleteCitations();
+	}, [onDeleteCitations]);
 
-	handleConfirmDeleteAll() {
-		this.setState({ isConfirmingDeleteAll: false });
-		this.props.onDeleteCitations();
-	}
+	const handleCancelDeleteAll = useCallback(() => {
+		setIsConfirmingDeleteAll(false);
+	}, []);
 
-	handleCancelDeleteAll() {
-		this.setState({ isConfirmingDeleteAll: false });
-	}
 
-	render() {
-		const entriesCount = this.props.items.length;
-		return [
+	return (
+        <Fragment>
 			<Button
 				key="delete-all-button"
-				className="btn-sm btn-outline-primary"
-				onClick={ this.handleDeleteAll.bind(this) }
+				className="btn-sm btn-outline-primary delete-all"
+				onClick={ handleDeleteAll }
 			>
-				Delete All
-			</Button>,
+				<FormattedMessage id="zbib.bibliography.deleteAll" defaultMessage="Delete Bibliography" />
+			</Button>
 			<Confirmation
 				key="delete-all-confirmation"
-				isOpen={ this.state.isConfirmingDeleteAll }
-				onConfirm={ this.handleConfirmDeleteAll.bind(this) }
-				onCancel={ this.handleCancelDeleteAll.bind(this) }
-				title="Clear Bibliography?"
-				confirmLabel="Delete"
-				>
-					<p>
-						{ entriesCount > 0 && (
-							<span>
-								{ entriesCount } { entriesCount > 1 ? 'entries' : 'entry' } will be deleted.
-							</span>
-						)
-						}
-					</p>
+				isOpen={ isConfirmingDeleteAll }
+				onConfirm={ handleConfirmDeleteAll }
+				onCancel={ handleCancelDeleteAll }
+				title={ intl.formatMessage({ id: "zbib.confirmDeleteAll.title", defaultMessage: "Clear Bibliography?" }) }
+				confirmLabel={ intl.formatMessage({ id: "zbib.confirmDeleteAll.confirm", defaultMessage: "Delete" }) }
+			>
+				<p>
+					<span>
+						<FormattedMessage
+							id="zbib.confirmDeleteAll.prompt"
+							defaultMessage="{bibliographyCount, plural,
+								one {# entry}
+								other {# entries}
+							} will be deleted."
+							values={ { bibliographyCount } }
+						/>
+					</span>
+				</p>
 			</Confirmation>
-		];
-	}
+		</Fragment>
+    );
+};
 
-	static propTypes = {
-		items: PropTypes.array,
-		onDeleteCitations: PropTypes.func.isRequired,
-	}
+DeleteAllButton.propTypes = {
+	bibliographyCount: PropTypes.number.isRequired,
+	onDeleteCitations: PropTypes.func.isRequired,
 }
 
-module.exports = DeleteAllButton;
+export default memo(DeleteAllButton);

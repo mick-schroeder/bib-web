@@ -4,30 +4,27 @@
 
 .section-cite {
 	border-top: none;
-	padding-top: $section-padding-mobile + 14px; // Distance to baseline meta-nav
+	padding-top: $section-padding-mobile + 21px; // Distance to baseline meta-nav
 	position: relative;
-	
-	@media (min-width: $bp-sm) {
-		min-height: 400px;
-	}
-	
+
 	@media (min-width: $bp-md) {
-		padding-top: $section-padding;
+		padding-top: $section-padding - 9px;
 	}
 
-	.howto {
-		float: right;
-		font-weight: bold;
-		text-align: center;
+	.meta-nav {
+		position: absolute;
+		right: $grid-gutter-width * 0.5;
+		top: $space-sm;
 		cursor: pointer;
-		padding: 0.7em 0.7em;
-		color: #61b2e4;
-		z-index: $zindex-menu;
+
+		a + a {
+			margin-left: $space-md;
+		}
 	}
 
-	section.brand {
+	.brand {
 		margin-bottom: $space-xl - 1px;
-		
+
 		@media (min-width: $bp-md) {
 			margin-bottom: $space-xxl - 1px;
 		}

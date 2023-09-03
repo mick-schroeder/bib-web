@@ -1,85 +1,144 @@
-'use strict';
+import { memo, useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+import { Button, Icon, Tabs, Tab, TabPane } from 'web-common/components';
+import { isTriggerEvent } from 'web-common/utils';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const KeyHandler = require('react-key-handler').default;
-const { KEYDOWN } = require('react-key-handler');
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const Modal = require('./modal');
-const Icon = require('zotero-web-library/src/js/component/ui/icon');
-const formatBib = require('../cite');
+import Modal from './modal';
+import { formatBib, formatFallback } from '../cite';
 
-class ConfirmAddDialog extends React.Component {
-	render() {
-		const { onConfirmAddCancel, onConfirmAddConfirm,
-			isConfirmingAdd, itemToConfirm } = this.props;
+const ConfirmAddDialog = props => {
+	const { activeDialog, onConfirmAddCancel, onConfirmAddConfirm, incomingStyle, itemToConfirm, selectedStyle } = props;
+	const isReady = itemToConfirm && activeDialog === 'CONFIRM_ADD_DIALOG';
 
-		if(!itemToConfirm) {
+	const [activeTab, setActiveTab] = useState('current-style-content');
+
+	const currentStyleHtml = useCallback(() => {
+		if (!itemToConfirm?.inCurrentStyle) {
 			return null;
 		}
+		const { bibliographyItems, bibliographyMeta } = itemToConfirm.inCurrentStyle;
+		const html = selectedStyle.styleHasBibliography ? formatBib(bibliographyItems, bibliographyMeta) : formatFallback(bibliographyItems);
+		return html;
+	}, [itemToConfirm, selectedStyle]);
 
-		const { citations, bibliography, isFallback } = itemToConfirm;
-		const html = isFallback ?
-			`<ol><li>${citations.join('</li><li>')}</li></ol>` :
-			formatBib(bibliography);
-		const div = document.createElement('div');
-		div.innerHTML = html;
+	const incomingStyleHtml = useCallback(() => {
+		if (!itemToConfirm?.inIncomingStyle) {
+			return null;
+		}
+		const { bibliographyItems, bibliographyMeta } = itemToConfirm.inIncomingStyle;
+		const html = incomingStyle.styleHasBibliography ? formatBib(bibliographyItems, bibliographyMeta) : formatFallback(bibliographyItems);
+		return html;
+	}, [incomingStyle, itemToConfirm]);
 
-		return (
-			<Modal
-				isOpen={ isConfirmingAdd }
-				contentLabel="Select the entry to add:"
-				className="multiple-choice-dialog modal modal-lg"
-				onRequestClose={ onConfirmAddCancel }
-			>
-				<KeyHandler
-					keyEventName={ KEYDOWN }
-					keyValue="Escape"
-					onKeyHandle={ onConfirmAddCancel }
-				/>
-				<KeyHandler
-					keyEventName={ KEYDOWN }
-					keyValue="Enter"
-					onKeyHandle={ onConfirmAddConfirm }
-				/>
-				<div className="modal-content" tabIndex={ -1 }>
-					<div className="modal-header">
-						<h4 className="modal-title text-truncate">
-							Add this citation to your bibliography?
-						</h4>
+
+	const handleConfirm = useCallback(ev => {
+		if(isTriggerEvent(ev)) {
+			onConfirmAddConfirm(activeTab === "incoming-style-content");
+		}
+	}, [activeTab, onConfirmAddConfirm]);
+
+	const handleSelectTab = useCallback(ev => {
+		setActiveTab(ev.getAttribute('aria-controls'));
+	}, []);
+
+	return isReady ? (
+		<Modal
+			isOpen={ activeDialog === 'CONFIRM_ADD_DIALOG' }
+			contentLabel="Confirm Add Citation"
+			className="confirm-add-dialog modal modal-lg"
+			onRequestClose={ onConfirmAddCancel }
+		>
+			<div className="modal-content" tabIndex={ -1 }>
+				<div className="modal-header">
+					<h4 className="modal-title text-truncate">
+						<FormattedMessage id="zbib.dialog.confirmAddThisCitation" defaultMessage="Add this citation to your bibliography?" />
+					</h4>
+					<Button
+						icon
+						className="close"
+						onClick={ onConfirmAddCancel }
+					>
+						<Icon type={ '24/remove' } width="24" height="24" />
+					</Button>
+				</div>
+				<div className="modal-body">
+
+					{ itemToConfirm.inIncomingStyle ? (
+						<>
+							<Tabs justified activateOnFocus>
+								<Tab
+									isActive={activeTab === "current-style-content"}
+									aria-controls="current-style-content"
+									onActivate={ handleSelectTab }
+								>
+									{ selectedStyle.titleShort ?? selectedStyle.title }
+								</Tab>
+								<Tab
+									isActive={activeTab === "incoming-style-content"}
+									aria-controls="incoming-style-content"
+									onActivate={ handleSelectTab }
+								>
+									{ incomingStyle.titleShort ?? incomingStyle.title }
+								</Tab>
+							</Tabs>
+							<TabPane
+								isActive={ activeTab === "current-style-content" }
+								id="current-style-content"
+							>
+								<div dangerouslySetInnerHTML={{ __html: currentStyleHtml() } } />
+							</TabPane>
+							<TabPane
+								isActive={ activeTab === "incoming-style-content" }
+								id="incoming-style-content"
+							>
+								<div dangerouslySetInnerHTML={ { __html: incomingStyleHtml() } } />
+							</TabPane>
+						</>
+					) : (
+						<div className="results">
+							<div dangerouslySetInnerHTML={{ __html: currentStyleHtml() }} />
+						</div>
+					) }
+
+					<div className="more-items-action">
 						<Button
-							className="close"
-							onClick={ onConfirmAddCancel }
+							autoFocus
+							className="btn-outline-secondary btn-min-width"
+							onClick={ handleConfirm }
+							onKeyDown = { handleConfirm }
 						>
-							<Icon type={ '24/remove' } width="24" height="24" />
+							{ activeTab === "incoming-style-content"  ? (
+								(incomingStyle.titleShort ?? incomingStyle.title).length > 40 ? (
+									<FormattedMessage
+										id="zbib.addAndSwitchShort"
+										defaultMessage={"Add and switch to this style"}
+									/>
+								) : (
+									<FormattedMessage
+										id="zbib.addAndSwitch"
+										defaultMessage={ "Add and switch to \"{style}\"" }
+										values={ { style: incomingStyle.titleShort ?? incomingStyle.title } }
+									/>
+								)
+							) : (
+								<FormattedMessage id="zbib.general.add" defaultMessage="Add" />
+							) }
 						</Button>
 					</div>
-					<div className="modal-body">
-						<div className="results">
-							<div
-								dangerouslySetInnerHTML={ { __html: div.innerHTML } }
-							/>
-						</div>
-						<div className="more-items-action">
-							<Button
-								className="btn-outline-secondary btn-min-width"
-								onClick={ onConfirmAddConfirm }
-							>
-								Add
-							</Button>
-						</div>
-					</div>
 				</div>
-			</Modal>
-		);
-	}
-
-	static propTypes = {
-		isConfirmingAdd: PropTypes.bool,
-		itemToConfirm: PropTypes.object,
-		onConfirmAddCancel: PropTypes.func.isRequired,
-		onConfirmAddConfirm: PropTypes.func.isRequired,
-	}
+			</div>
+		</Modal>
+	) : null;
 }
 
-module.exports = ConfirmAddDialog;
+ConfirmAddDialog.propTypes = {
+	activeDialog: PropTypes.string,
+	incomingStyle: PropTypes.object,
+	selectedStyle: PropTypes.object,
+	itemToConfirm: PropTypes.object,
+	onConfirmAddCancel: PropTypes.func.isRequired,
+	onConfirmAddConfirm: PropTypes.func.isRequired,
+}
+
+export default memo(ConfirmAddDialog);

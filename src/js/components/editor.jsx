@@ -1,160 +1,149 @@
-/* eslint-disable react/no-deprecated */
-// @TODO: migrate to getDerivedStateFromProps()
-'use strict';
+import cx from 'classnames';
+import PropTypes from 'prop-types';
+import { useEffect, useCallback, useMemo, useReducer, useRef, memo } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Button } from 'web-common/components';
+import { usePrevious } from 'web-common/hooks';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const cx = require('classnames');
-const deepEqual = require('deep-equal');
-const KeyHandler = require('react-key-handler').default;
-const { KEYDOWN } = require('react-key-handler');
+import ItemBox from './itembox';
+import Modal from './modal';
+import { hideFields, noEditFields } from '../constants/item';
+import { reverseMap } from '../utils';
+import { Zotero } from '../zotero-shim.js';
 
-const Button = require('zotero-web-library/src/js/component/ui/button');
-const ItemBox = require('zotero-web-library/src/js/component/item/box');
-const Spinner = require('zotero-web-library/src/js/component/ui/spinner');
-const { baseMappings } = require('zotero-web-library/src/js/constants/item');
-const { getItemTypeMeta } = require('../utils');
-const { hideFields, noEditFields } = require('zotero-web-library/src/js/constants/item');
-const { reverseMap } = require('zotero-web-library/src/js/utils');
-const Modal = require('./modal');
+const ITEM_UPDATED = 'ITEM_UPDATED';
+const BEGIN_ITEM_UPDATE = 'BEGIN_ITEM_UPDATE';
 
-class Editor extends React.PureComponent {
-	constructor(props) {
-		super(props);
-		this.state = {
-			isLoading: true,
-			hasCreatedItem: false
-		};
+const hiddenFields = [
+	...hideFields,
+	'rights',
+	'extra',
+];
+
+const getFieldsAndItems = (item, itemTypeFields, itemTypeOptions, baseMappings) => {
+	if (!item || !itemTypeFields || !itemTypeOptions) {
+		return { item, fields: [] }
 	}
 
-	async componentDidMount() {
-		this.prepareState(this.props);
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if(this.props.isEditorOpen === nextProps.isEditorOpen
-			&& deepEqual(this.props.editorItem, nextProps.editorItem)) {
-			return;
-		}
-
-		this.prepareState(nextProps);
-	}
-
-	componentDidUpdate({ isEditorOpen }) {
-		if(this.props.isEditorOpen && !isEditorOpen) {
-			this.isRecentlyOpen = true;
-		}
-		if(this.isRecentlyOpen && this.itemBox) {
-			this.itemBox.focusField('itemType');
-			this.isRecentlyOpen = false;
-		}
-	}
-
-	async prepareState(props) {
-		var item;
-		if(!props.isEditorOpen) {
-			this.setState({
-				fields: [],
-				isLoading: true,
-				item: null,
-			});
-			return;
-		}
-
-		if(!props.editorItem) {
-			item = {
-				version: 0,
-				itemType: 'book',
-				tags: [],
-				creators: []
-			};
-		} else {
-			item = { ...props.editorItem };
-		}
-
-		try {
-			var { itemTypes, itemTypeFields, itemTypeCreatorTypes } = await getItemTypeMeta(item.itemType);
-		} catch(e) {
-			this.props.onError('Failed to obtain metadata. Please check your connection and try again.', e);
-			this.setState({
-				isLoading: false
-			});
-			return;
-		}
-
-		itemTypes = itemTypes.map(it => ({
-			value: it.itemType,
-			label: it.localized
-		})).filter(it => it.value != 'note');
-
-		itemTypeCreatorTypes = itemTypeCreatorTypes.map(ct => ({
-			value: ct.creatorType,
-			label: ct.localized
-		}));
-
-		const hiddenFields = [
-			...hideFields,
-			'rights',
-			'extra',
-		];
-
-		const titleField = item.itemType in baseMappings && baseMappings[item.itemType]['title'] || 'title';
-
-		var fields = [
+	const titleField = item.itemType in baseMappings && baseMappings[item.itemType]['title'] || 'title';
+	let fields = [
 			{ field: 'itemType', localized: 'Item Type' },
 			itemTypeFields.find(itf => itf.field === titleField),
 			{ field: 'creators', localized: 'Creators' },
 			...itemTypeFields.filter(itf => itf.field !== titleField)
-		];
+		]
+		.filter(f => f && !hiddenFields.includes(f.field))
+		.concat([
+			itemTypeFields.find(itf => itf.field === 'abstractNote'),
+			itemTypeFields.find(itf => itf.field === 'extra'),
+		]);
 
-		// Add Original Date field to book and bookSection #188
-		if(['book', 'bookSection'].includes(item.itemType)) {
-			let dateIndex = fields.findIndex(f => f.field === 'date');
-			fields.splice(dateIndex + 1, 0, { field: 'original-date', localized: 'Original Date' });
-			let matches = 'extra' in item && item.extra.match(/^original-date:\s*(.*?)$/);
-			if(matches) {
-				item['original-date'] = matches[1];
-				item.extra = item.extra.replace(/^original-date:\s*.*?$/, '');
-			}
+	// Add Original Date field to book and bookSection #188
+	if(['book', 'bookSection'].includes(item.itemType)) {
+		let dateIndex = fields.findIndex(f => f.field === 'date');
+		fields.splice(dateIndex + 1, 0, { field: 'original-date', localized: 'Original Date' });
+		let matches = 'extra' in item && item.extra.match(/^original-date:\s*(.*?)$/);
+		if(matches) {
+			item['original-date'] = matches[1];
+			item.extra = item.extra.replace(/^original-date:\s*.*?$/, '');
 		}
-
-		// Add Publisher to webpage
-		if(['webpage'].includes(item.itemType)) {
-			let beforeIndex = fields.findIndex(f => f.field === 'websiteType');
-			fields.splice(beforeIndex + 1, 0, { field: 'publisher', localized: 'Publisher' });
-			let matches = 'extra' in item && item.extra.match(/^publisher:\s*(.*?)$/i);
-			if (matches) {
-				item['publisher'] = matches[1];
-				item.extra = item.extra.replace(/^publisher:\s*.*?$/, '');
-			}
-		}
-
-		fields = fields.filter(f => f && !hiddenFields.includes(f.field))
-			.concat([
-				itemTypeFields.find(itf => itf.field === 'abstractNote'),
-				itemTypeFields.find(itf => itf.field === 'extra'),
-		])
-			.map(f => ({
-				options: f.field === 'itemType' ? itemTypes : null,
-				key: f.field,
-				label: f.localized,
-				readonly: noEditFields.includes(f.field),
-				processing: false,
-				value: f.field in item ? item[f.field] : null
-		}));
-
-		this.setState({
-			item,
-			fields,
-			creatorTypes: itemTypeCreatorTypes,
-			isLoading: false
-		});
 	}
 
-	async handleItemUpdate(fieldKey, newValue) {
+	// Add Publisher to webpage
+	if(['webpage'].includes(item.itemType)) {
+		let beforeIndex = fields.findIndex(f => f.field === 'websiteType');
+		fields.splice(beforeIndex + 1, 0, { field: 'publisher', localized: 'Publisher' });
+		let matches = 'extra' in item && item.extra.match(/^publisher:\s*(.*?)$/i);
+		if (matches) {
+			item['publisher'] = matches[1];
+			item.extra = item.extra.replace(/^publisher:\s*.*?$/, '');
+		}
+	}
+
+	fields = fields.map(f => ({
+			options: f.field === 'itemType' ? itemTypeOptions : null,
+			key: f.field,
+			label: f.localized,
+			readonly: noEditFields.includes(f.field),
+			processing: false,
+			value: f.field in item ? item[f.field] : null
+	}));
+
+	return { item, fields };
+}
+
+const editorReducer = (state, action) => {
+	if(action.type === ITEM_UPDATED) {
+		return {
+			...state,
+			...getFieldsAndItems(
+				action.item,
+				state.itemTypeFields?.[action.item?.itemType] ?? [],
+				state.itemTypeOptions,
+				state.baseMappings
+			)
+		}
+	}
+
+	if(action.type === BEGIN_ITEM_UPDATE) {
+		const fieldIndex = state.fields.findIndex(field => field.key === action.fieldKey);
+		return {
+			...state,
+			fields: [
+				...state.fields.slice(0, fieldIndex),
+				{
+					...state.fields[fieldIndex],
+					processing: true,
+					value: action.newValue
+				},
+				...state.fields.slice(fieldIndex + 1)
+			]
+		}
+	}
+
+	return state;
+}
+
+const Editor = props => {
+	const { activeDialog, className, editorItem, meta, onEditorClose, onItemCreated, onItemUpdate } = props;
+	const prevEditorItem = usePrevious(editorItem);
+	const itemBox = useRef(null);
+	const hasCreatedItem = useRef(null);
+	const accumulatedPatch = useRef({});
+	const debouncedApplyAccumulatedPatchRef = useRef(useDebouncedCallback(itemKey => {
+		onItemUpdate(itemKey, accumulatedPatch.current);
+		accumulatedPatch.current = {};
+	}, 1000));
+
+	const { baseMappings, itemTypes, itemTypeFields, itemTypeCreatorTypes } = meta;
+	const [editor, dispatchEditor] = useReducer(editorReducer, {
+		fields: [],
+		item: editorItem,
+		baseMappings: baseMappings,
+		itemTypes,
+		itemTypeFields,
+		itemTypeCreatorTypes,
+		itemTypeOptions: itemTypes.map(it => ({
+			value: it.itemType,
+			label: it.localized
+		}))
+	});
+	const intl = useIntl();
+
+	//move to state?
+	const creatorTypeOptions = useMemo(() => (itemTypeCreatorTypes?.[editorItem?.itemType] || []).map(ct => ({
+		value: ct.creatorType,
+		label: ct.localized
+	})), [editorItem, itemTypeCreatorTypes]);
+
+	const itemTitle = editor.item ?
+		editor.item[editor.item.itemType in baseMappings && baseMappings[editor.item.itemType]['title'] || 'title'] : '';
+
+	const handleItemUpdate = useCallback(async (fieldKey, newValue) => {
 		// Add Original Date field to book and bookSection #188
 		if(fieldKey === 'original-date') {
-			let extra = 'extra' in this.state.item ? this.state.item.extra : '';
+			let extra = editor.item?.extra ?? '';
 			let matches = extra.match(/^original-date:\s*(.*?)$/);
 			if(matches) {
 				extra = extra.replace(/^original-date:\s*(.*?)$/, `original-date: ${newValue}`);
@@ -170,8 +159,8 @@ class Editor extends React.PureComponent {
 		}
 
 		// Add Publisher to webpage
-		if((fieldKey === 'publisher') && ['webpage'].includes(this.state.item.itemType)) {
-			let extra = 'extra' in this.state.item ? this.state.item.extra : '';
+		if((fieldKey === 'publisher') && editor.item.itemType === 'webpage') {
+			let extra = editor.item?.extra ?? '';
 			let matches = extra.match(/^publisher:\s*(.*?)$/);
 			if (matches) {
 				extra = extra.replace(/^publisher:\s*(.*?)$/, `publisher: ${newValue}`);
@@ -188,133 +177,121 @@ class Editor extends React.PureComponent {
 			newValue = extra;
 		}
 
-		if(!('key' in this.state.item)) {
-			this.state.item.key = Math.random().toString(36).substr(2, 8).toUpperCase();
-			this.props.onItemCreated({
-				...this.state.item,
+		if (fieldKey === 'accessDate' || fieldKey === 'date' || fieldKey === baseMappings?.[editor.item.itemType]?.['date']) {
+			newValue = Zotero.Date.parseDescriptiveString(newValue);
+		}
+
+		if(!('key' in editor.item)) {
+			editor.item.key = Math.random().toString(36).substr(2, 8).toUpperCase();
+			onItemCreated({
+				...editor.item,
 				[fieldKey]: newValue
 			});
-			this.setState({ hasCreatedItem: true });
+			hasCreatedItem.current = true;
 			return;
 		}
 
-		let fieldIndex = this.state.fields.findIndex(field => field.key == fieldKey);
-		this.setState({
-			fields: [
-				...this.state.fields.slice(0, fieldIndex),
-				{
-					...this.state.fields[fieldIndex],
-					processing: true,
-					value: newValue
-				},
-				...this.state.fields.slice(fieldIndex + 1)
-			]
-		}, () => {
-			var patch = {
-				[fieldKey]: newValue
-			};
-			// @TODO: deduplicate from web-library
-			// when changing itemType, map fields to base types and back to item-specific types
-			if(fieldKey === 'itemType') {
-				const baseValues = {};
-				if(this.state.item.itemType in baseMappings) {
-					const namedToBaseMap = reverseMap(baseMappings[this.state.item.itemType]);
-					Object.keys(this.state.item).forEach(fieldName => {
-						if(fieldName in namedToBaseMap) {
-							if(this.state.item[fieldName].toString().length > 0) {
-								baseValues[namedToBaseMap[fieldName]] = this.state.item[fieldName];
-							}
-						}
-					});
-				}
+		dispatchEditor({ type: BEGIN_ITEM_UPDATE, fieldKey, newValue });
 
-				patch = { ...patch, ...baseValues };
+		// TODO: deduplicate from web-library
+		// when changing itemType, map fields to base types and back to item-specific types
+		var patch = {
+			[fieldKey]: newValue
+		};
 
-				if(newValue in baseMappings) {
-					const namedToBaseMap = baseMappings[newValue];
-					const itemWithBaseValues = { ...this.state.item, ...baseValues };
-					Object.keys(itemWithBaseValues).forEach(fieldName => {
-						if(fieldName in namedToBaseMap) {
-							patch[namedToBaseMap[fieldName]] = itemWithBaseValues[fieldName];
-							patch[fieldName] = '';
+		if(fieldKey === 'itemType') {
+			const baseValues = {};
+			if(editor.item.itemType in baseMappings) {
+				const namedToBaseMap = reverseMap(baseMappings[editor.item.itemType]);
+				Object.keys(editor.item).forEach(fieldName => {
+					if(fieldName in namedToBaseMap) {
+						if(editor.item[fieldName].toString().length > 0) {
+							baseValues[namedToBaseMap[fieldName]] = editor.item[fieldName];
 						}
-					});
-				}
+					}
+				});
 			}
-			this.props.onItemUpdate(this.state.item.key, patch);
-		});
-	}
 
-	handleClose() {
-		this.props.onEditorClose(this.state.hasCreatedItem);
-	}
+			patch = { ...patch, ...baseValues };
 
-	get itemTitle() {
-		let item = this.state.item;
-		if(item) {
-			let field = item.itemType in baseMappings && baseMappings[item.itemType]['title'] || 'title';
-			return item[field];
+			if(newValue in baseMappings) {
+				const namedToBaseMap = baseMappings[newValue];
+				const itemWithBaseValues = { ...editor.item, ...baseValues };
+				Object.keys(itemWithBaseValues).forEach(fieldName => {
+					if(fieldName in namedToBaseMap) {
+						patch[namedToBaseMap[fieldName]] = itemWithBaseValues[fieldName];
+						patch[fieldName] = '';
+					}
+				});
+			}
 		}
-		return '';
-	}
+		accumulatedPatch.current = { ...accumulatedPatch.current, ...patch };
+		debouncedApplyAccumulatedPatchRef.current(editor.item.key);
+	}, [baseMappings, editor.item, onItemCreated]);
 
-	renderModalContent() {
-		return (
+	const handleClose = useCallback(() => {
+		debouncedApplyAccumulatedPatchRef.current.flush();
+		onEditorClose(hasCreatedItem.current);
+	}, [onEditorClose]);
+
+	useEffect(() => {
+		if(activeDialog === 'EDITOR') {
+			setTimeout(() => {
+				itemBox.current?.focus();
+			}, 0);
+			hasCreatedItem.current = false;
+		}
+	}, [activeDialog]);
+
+	useEffect(() => {
+		if(editorItem !== prevEditorItem) {
+			dispatchEditor({ type: ITEM_UPDATED, item: editorItem });
+		}
+	}, [editorItem, prevEditorItem])
+
+	return (
+		<Modal
+			isOpen={ activeDialog === 'EDITOR' }
+			contentLabel={ intl.formatMessage({ id: 'zbib.editor.title', defaultMessage: 'Item Editor' }) }
+			className={ cx('editor-container modal modal-lg')}
+			onRequestClose={ handleClose }
+		>
 			<div className="modal-content" tabIndex={ -1 }>
-				<div className="modal-header">
-					<h4 className="modal-title text-truncate">
-					{ this.itemTitle }
-					</h4>
-					<Button
-						className="btn-outline-inverse-blue-dark"
-						onClick={ () => this.props.onEditorClose(this.state.hasCreatedItem) }
-					>
-						Done
-					</Button>
-				</div>
-				<div className="modal-body">
-					<div className={ cx('editor', this.props.className ) }>
-						<ItemBox
-							{ ...this.state }
-							ref={ ref => this.itemBox = ref}
-							isForm={ true }
-							onSave={ this.handleItemUpdate.bind(this) }
-						/>
-					</div>
+			<div className="modal-header">
+				<h4 className="modal-title text-truncate">
+				{ itemTitle }
+				</h4>
+				<Button
+					className="btn-outline-inverse-blue-dark"
+					onClick={ handleClose }
+				>
+					<FormattedMessage id="zbib.general.done" defaultMessage="Done" />
+				</Button>
+			</div>
+			<div className="modal-body">
+				<div className={ cx('editor', className ) }>
+					<ItemBox
+						creatorTypes={ creatorTypeOptions }
+						fields={ editor.fields }
+						onSave={ handleItemUpdate }
+						ref={ itemBox }
+					/>
 				</div>
 			</div>
-		);
-	}
-
-	render() {
-		return (
-			<Modal
-				isOpen={ this.props.isEditorOpen }
-				contentLabel="Item Editor"
-				className={ cx('editor-container modal modal-lg', { loading: this.state.isLoading })}
-				onRequestClose={ this.handleClose.bind(this) }
-			>
-				<KeyHandler
-					keyEventName={ KEYDOWN }
-					keyValue="Escape"
-					onKeyHandle={ this.handleClose.bind(this) }
-				/>
-				{ this.state.isLoading ? <Spinner /> : this.renderModalContent() }
-			</Modal>
-		);
-	}
-
-	static propTypes = {
-		className: PropTypes.string,
-		editorItem: PropTypes.object,
-		isEditorOpen: PropTypes.bool,
-		items: PropTypes.array,
-		location: PropTypes.object,
-		onEditorClose: PropTypes.func.isRequired,
-		onError: PropTypes.func.isRequired,
-		onItemCreated: PropTypes.func.isRequired,
-		onItemUpdate: PropTypes.func.isRequired,
-	}
+		</div>
+		</Modal>
+	);
 }
 
-module.exports = Editor;
+Editor.propTypes = {
+	activeDialog: PropTypes.string,
+	className: PropTypes.string,
+	editorItem: PropTypes.object,
+	meta: PropTypes.object,
+	onEditorClose: PropTypes.func.isRequired,
+	onError: PropTypes.func.isRequired,
+	onItemCreated: PropTypes.func.isRequired,
+	onItemUpdate: PropTypes.func.isRequired,
+}
+
+export default memo(Editor);

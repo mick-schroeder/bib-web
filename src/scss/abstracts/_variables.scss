@@ -11,28 +11,19 @@
 // Colors
 //
 
-$red:          #c8102e;
-$blue:         #1e50a0;
-$blue-dark:    #61b2e4;
-$blue-darkest: #1e50a0;
-$violet:       #8967aa;
-$indigo: #622aff;
-$blue-bright: #0e90db;
-$pink: #e94256;
-$green: #0b9e43;
-$azure: #027fff;
-$teal: #2294b1;
-$fuchsia: #dd04d1;
-$orange: #e2620c;
-$cornflower: #0e90db;
-$mahogany: #e94b1b;
-$avocado: #5f9800;
+$red:           #e52e3d;
+$blue:          #2970ff;
+$blue-dark:     #333c66;
+$blue-darkest:  #3d4466;
+$violet:        #5959ff;
+$asphalt:       #7a8799;
+$asphalt-light: #dadee3;
 
 $primary:   $red;
 $secondary: $blue;
 $error:     $primary;
-$warning:  $red;
-$success:   #5c9e31;
+$warning:   #ff794d;
+$success:   #3abd57;
 $info:      $blue;
 
 $shade-0: #fff;
@@ -44,14 +35,18 @@ $shade-4: #bbb;
 $shade-5: #999;
 $shade-6: #777;
 $shade-7: #222;
+$shade-8:  #333;
+$shade-9:  #111;
+$shade-10: #000;
 
+$focus-color: $secondary;
 
 //
 // Body
 //
 
 $body-color: $shade-7;
-$body-bg:    #f5f5f7;
+$body-bg:    $shade-0;
 
 $selection-color: $shade-0;
 $selection-bg:    $secondary;
@@ -61,19 +56,23 @@ $selection-bg:    $secondary;
 // Type
 //
 
-$font-family-sans-serif: "HelveticaNeue", "Helvetica Neue", "Helvetica", 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', "Tahoma", "Arial", sans-serif;
+$font-family-sans-serif: AvenirNextLTPro, system-ui; // todo
 $font-family-base: $font-family-sans-serif;
 
 $font-size-base: 16px;
 $line-height-base: 1.5;
+$line-height-base-mobile: 1.5;
+
+$line-height-large: 26px;
+$line-height-large-touch: 42px;
 
 $font-size-lg: 24px;
 $font-size-sm: 14px;
 
-$h1-font-size: 42px;
-$h2-font-size: 33px;
-$h3-font-size: 26px;
-$h4-font-size: 20px;
+$h1-font-size: 60px;
+$h2-font-size: 40px;
+$h3-font-size: 32px;
+$h4-font-size: 24px;
 $h5-font-size: 20px;
 
 $h1-font-size-mobile: 40px;
@@ -82,14 +81,16 @@ $h3-font-size-mobile: 24px;
 $h4-font-size-mobile: 20px;
 
 $headings-line-height: 1.1;
-$headings-font-weight: 400;
+$headings-font-weight: 300;
 
 $link-color: $secondary;
 $link-transition: 0.15s ease;
 
 $lead-font-size:        24px;
 $lead-font-size-mobile: 20px;
-$lead-font-weight:      400;
+$lead-font-weight:      300;
+
+$text-color: $shade-9;
 
 
 //
@@ -107,6 +108,8 @@ $space-xxxl: 64px;
 $space-max:  96px;
 
 
+
+
 //
 // Grid
 //
@@ -114,31 +117,36 @@ $space-max:  96px;
 $body-min-width: 320px;
 
 $grid-gutter-width: $space-xl;
-$container-width:   1004px + $grid-gutter-width;
-//$container-width:   600px;
+$container-width:   768px + $grid-gutter-width;
 
 $bp-xs: 0px;
 $bp-sm: 568px;
 $bp-md: 768px;
 $bp-lg: 1004px;
 $bp-xl: 1200px;
-$bp-xxl: 1520px;
 
 $grid-breakpoints: (
 	xs: $bp-xs,
 	sm: $bp-sm,
 	md: $bp-md,
 	lg: $bp-lg,
-	xl: $bp-xl,
+	xl: $bp-xl
 );
+
 
 //
 // Components
 //
 
-$border-radius:    10px;
-$border-radius-sm: 7px;
-$border-radius-lg: 10px;
+$padding-x-sm: $space-sm;
+$padding-x-md: $space-md;
+
+$default-padding-x:       $space-sm;
+$default-padding-x-touch: $space-md;
+
+$border-radius:    4px;
+$border-radius-sm: 3px;
+$border-radius-lg: 6px;
 
 $border-width: 1px;
 
@@ -146,22 +154,25 @@ $menu-bg: $body-bg;
 $menu-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 3px 8px rgba(0, 0, 0, 0.2);
 $menu-border-radius: $border-radius-sm;
 $menu-item-hover-bg: $shade-1;
-
+$menu-item-selected-bg: $shade-2;
+$menu-devider: $shade-2;
+$menu-no-results-color: $shade-5;
 
 //
 // Z-index master list
 //
 
-$zindex-menu:     1000;
-$zindex-messages: 1010;
+$z-index-menu: 		50;
+$z-index-modal: 	60;
+$z-index-messages:	100;
 
 
 //
 // Sections
 //
 
-$section-padding:        $space-lg;
-$section-padding-mobile: $space-lg;
+$section-padding:        $space-xxxl + $space-xs;
+$section-padding-mobile: $space-xxl;
 
 
 //
@@ -198,7 +209,7 @@ $btn-padding-y-sm: 3px;
 
 $btn-primary-color:   $primary;
 $btn-secondary-color: $secondary;
-$btn-light-color:     $shade-6;
+$btn-light-color:     $shade-5;
 $btn-error-color:     $error;
 $btn-warning-color:   $warning;
 $btn-info-color:      $info;
@@ -237,6 +248,13 @@ $input-border-width: $border-width;
 
 $input-transition: 0.15s ease;
 
+// Forms
+$form-bg-touch:             $shade-1;
+$input-color:               $text-color;
+$input-bg:                  $body-bg;
+$input-border-color-touch:  $shade-5;
+$checkbox-border-touch:     $shade-4;
+$checkbox-checked-bg-touch: $secondary;
 
 //
 // Icon
@@ -244,7 +262,8 @@ $input-transition: 0.15s ease;
 
 $icon-color: $secondary;
 $icon-spin-size: $space-xl;
-
+$icon-spin-size-sm: $space-md;
+$icon-active-color: $shade-9;
 
 //
 // Outline
@@ -254,6 +273,20 @@ $outline-color:  $secondary;
 $outline-width:  3px;
 $outline-offset: 2px;
 
+// Editable
+// --------------------------------------------------
+
+$editable-border-width:  $outline-width;
+$editable-padding:       2px;
+$editable-border-radius: 3px;
+
+$editable-color:             $text-color;
+$editable-bg:                $shade-0;
+$editable-border-color:      $secondary;
+$editable-hover-percent:     0.04;
+$editable-hover-bg:          rgba($shade-10, $editable-hover-percent);
+$editable-backdrop-bg:       $shade-1;
+$editable-backdrop-hover-bg: darken($shade-1, ($editable-hover-percent * 100%));
 
 //
 // Icons
@@ -277,7 +310,7 @@ $badge-light-bg: $shade-0;
 // Zotero bib
 //
 
-$schroeder-cite-spinner-size: $space-xl;
+$zotero-bib-spinner-size: $space-xl;
 
 
 //
@@ -300,10 +333,10 @@ $style-border-color: $shade-2;
 // React-modal
 //
 
-$modal-backdrop-bg:           rgba($shade-5, 0.9);
+$modal-backdrop-bg:           rgba($blue-darkest, 0.5);
 $modal-content-bg:            $shade-0;
 $modal-header-color:          $shade-0;
-$modal-header-bg:             $blue;
+$modal-header-bg:             $blue-dark;
 $modal-title-line-height:     $space-xl;
 $modal-footer-border-width:   1px;
 $modal-footer-border-color:   $shade-2;
@@ -349,11 +382,20 @@ $message-success-bg:       $success;
 $permalink-spinner-size: $space-xl;
 
 
-//
-// Dropdown
-//
+// Menu (select, dropdown, …)
+$menu-color: $text-color;
+$menu-color-disabled: lighten($text-color, 33%);
+$menu-bg: $body-bg;
+$menu-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 3px 8px rgba(0, 0, 0, 0.2);
+$menu-item-hover-bg: mix($shade-10, $shade-1, 2%);
+$menu-item-selected-bg: $shade-2;
+$menu-item-selected-hover-bg: $shade-3;
+$menu-devider: $shade-2;
+$menu-no-results-color: $shade-5;
 
-$dropdown-menu-bg: $body-bg;
+$menu-border-radius: $border-radius-sm;
+$dropdown-item-padding-x-touch: $space-md;
+$dropdown-item-padding-y-touch: 9px;
 
 
 //
@@ -376,12 +418,22 @@ $preview-border-color: $review-border-color;
 // About
 //
 
-$about-bg:    #f5f5f7;
+$about-bg:    $blue-dark;
 $about-color: $shade-0;
 
-//
-// Navbar
-//
+// Metadata list
+$metadata-list-offset:             33%;
+$key-color:                $shade-6;
+$handle-color-touch:       $shade-4;
+$handle-color-mouse:       $shade-6;
+$metadata-heading-color:   $shade-5;
+$metadata-separator-color: $shade-3;
 
-$navbar-padding-y: 0.5em;
-$navbar-padding-x: 0.5em;
+// Creators
+$creators-last-name-max-width:       67%;
+$creators-value-padding-right-touch: 31px;
+$creator-color-transition: .5s cubic-bezier(1,0,.5,.5);
+$creator-color-transition-delay: .1s;
+
+$select-chevron-icon: "bg-icons/16/chevron-11-down-777.svg";
+$select-value-padding-desktop: 0 $input-btn-padding-x;

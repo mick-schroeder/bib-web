@@ -1,14 +1,18 @@
-'use strict';
+import './wdyr';
+import SmoothScroll from 'smooth-scroll';
+import ZoteroBibComponent from './bib-component';
 
-require('babel-regenerator-runtime');
+// required for Safari 10.1
+import '@formatjs/intl-getcanonicallocales/polyfill'
+import '@formatjs/intl-locale/polyfill'
+// required for Safari <= 12.1
+import '@formatjs/intl-pluralrules/polyfill'
+import '@formatjs/intl-pluralrules/locale-data/en' // locale-data for en
 
-const SmoothScroll = require('smooth-scroll');
-const ZoteroBibComponent = require('./bib-component');
-
-const targetDom = document.getElementById('schroeder-cite');
+const targetDom = document.getElementById('zotero-bib');
 
 if(targetDom) {
-	const config = JSON.parse(document.getElementById('schroeder-cite-config').textContent);
+	const config = JSON.parse(document.getElementById('zotero-bib-config').textContent);
 	ZoteroBibComponent.init(targetDom, config);
 } else {
 	new SmoothScroll('main.faq a[href*="#"]', {offset: 16});

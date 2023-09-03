@@ -1,42 +1,57 @@
-'use strict';
+import { useCallback, memo } from 'react';
+import PropTypes from 'prop-types';
+import cx from 'classnames';
+import { useIntl } from 'react-intl';
+import { Select, SelectDivider, SelectOption } from 'web-common/components';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const cx = require('classnames');
-const Select = require('react-select').default;
-const { citationStylesCount } = require('../../../data/citation-styles-data.json');
+import { citationStylesCount } from '../../../data/citation-styles-data.json';
 
-class StyleSelector extends React.Component {
-	render() {
-		return (
-			<div className={ cx('style-selector', this.props.className ) }>
+const StyleSelector = ({ className, citationStyle, citationStyles, onCitationStyleChanged }) => {
+	const handleMoreStylesTrigger = useCallback(
+		() => onCitationStyleChanged('install'), [onCitationStyleChanged]
+	);
+	const intl = useIntl();
+
+	return (
+			<div className={ cx('style-selector', className ) }>
 				<Select
+					aria-label={ intl.formatMessage({
+						id: 'zbib.styleSelector.label',
+						defaultMessage: 'Citation Style',
+					}) }
 					clearable={ false }
 					searchable={ false}
-					value={ this.props.citationStyle }
+					value={ citationStyle }
 					options={ [
-						...this.props.citationStyles.map(cs => ({
+						...citationStyles.map(cs => ({
 							value: cs.name,
 							label: cs.title
 						})),
-						{
-							value: 'install',
-							label: `${(Math.floor(citationStylesCount / 100) * 100).toLocaleString()}+ other styles available…`
-						}
 					] }
-					onChange={ ev => this.props.onCitationStyleChanged(ev.value) }
-				/>
+					onChange={ onCitationStyleChanged }
+				>
+					<SelectDivider />
+					<SelectOption
+						onTrigger={ handleMoreStylesTrigger }
+						option={ {
+							value: 'install',
+							label: intl.formatMessage({
+								id: 'zbib.styleSelector.otherStyles',
+								defaultMessage: '{citationStylesCount, plural, other {#+ other styles} } available…',
+							}, { citationStylesCount: Math.floor(citationStylesCount / 1000) * 1000 })
+						}}
+						/>
+				</Select>
 			</div>
 		);
-	}
+}
 
-	static propTypes = {
-		className: PropTypes.string,
-		citationStyle: PropTypes.string,
-		citationStyles: PropTypes.array,
-		onCitationStyleChanged: PropTypes.func
-	}
+StyleSelector.propTypes = {
+	className: PropTypes.string,
+	citationStyle: PropTypes.string,
+	citationStyles: PropTypes.array,
+	onCitationStyleChanged: PropTypes.func
 }
 
 
-module.exports = StyleSelector;
+export default memo(StyleSelector);

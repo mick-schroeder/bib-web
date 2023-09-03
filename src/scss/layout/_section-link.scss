@@ -7,7 +7,12 @@
 	padding-top: $section-padding-mobile - 10px; // t height
 
 	@media (min-width: $bp-md) {
-		padding-top: $section-padding; // t height
+		padding-top: $section-padding - 12px; // t height
+	}
+
+	.header-wrapper {
+		display: flex;
+		justify-content: center;
 	}
 
 	.whats-this {

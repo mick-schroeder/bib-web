@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	'html': {
 		extension: 'html',
 		mime: 'text/html',
@@ -6,7 +6,7 @@ module.exports = {
 		isDownloadable: false,
 		isCopyable: true
 	},
-	'text': {
+	'plain': {
 		extension: 'txt',
 		mime: 'text/plain',
 		label: 'Copy to Clipboard',
@@ -39,21 +39,5 @@ module.exports = {
 		label: 'Save to Zotero',
 		isDownloadable: true,
 		isCopyable: false
-	},
-	'citation': {
-		extension: 'txt',
-		mime: 'text/plain',
-		label: 'Copy Citation',
-		include: 'html',
-		isDownloadable: false,
-		isCopyable: true
-	},
-	'filename': {
-		label: 'Copy Filename',
-		extension: 'txt',
-		mime: 'text/plain',
-		include: 'html',
-		isDownloadable: false,
-		isCopyable: true
 	}
 };
