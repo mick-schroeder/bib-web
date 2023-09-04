@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { useIntl, FormattedMessage } from 'react-intl';
 import { Button, Icon } from 'web-common/components';
 import { pick } from 'web-common/utils';
-
+import Features from './features';
 //import About from './about';
 import BibliographySection from './bibliographySection';
 import Brand from './brand';
@@ -118,6 +118,9 @@ const ZBib = props => {
 					// !props.isReadOnly && (
 					// 	<About onGetStartedClick={ props.onGetStartedClick } />
 					// )
+					 !props.isReadOnly && (
+					 	<Features onGetStartedClick={ props.onGetStartedClick } />
+					 )
 				}
 
 				{ (!props.isHydrated || (props.isHydrated && props.isReady)) && (
@@ -143,7 +146,7 @@ const ZBib = props => {
 						<p>
 							<FormattedMessage
 								id="zbib.confirmCase.conversionExample"
-								defaultMessage="<b>ZoteroBib conversion:</b> <i>{ conversionExample }</i>"
+								defaultMessage="<b>Conversion:</b> <i>{ conversionExample }</i>"
 								values={ { ...commonFormats, conversionExample }}
 							/>
 						</p>

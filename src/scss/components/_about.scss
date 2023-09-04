@@ -3,11 +3,11 @@
 //
 
 .about {
-	background: $about-bg;
-	color: $shade-0;
+	//background: $about-bg;
+	//color: $shade-0;
 	text-align: center;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	//-webkit-font-smoothing: antialiased;
+	//-moz-osx-font-smoothing: grayscale;
 
 	.container {
 		@media (min-width: $bp-md) {
@@ -20,7 +20,7 @@
 		}
 	}
 
-	.column {
+	/* .column {
 		@media (min-width: $bp-lg) {
 			flex: 0 0 50%;
 
@@ -32,7 +32,7 @@
 				padding-left: 40px;
 			}
 		}
-	}
+	} */
 
 	.h4 {
 		margin-bottom: $space-xs;
@@ -66,9 +66,7 @@
 
 	.features {
 		text-align: left;
-		margin-top: 80px - 17px;
-		margin-bottom: $space-xxxl - 6px;
-
+	
 		@media (min-width: $bp-md) {
 			margin-top: 120px - 20px;
 			margin-bottom: $space-max - 6px;

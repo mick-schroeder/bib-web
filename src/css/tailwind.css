@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+body {@apply tw-antialiased tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white}
+.faq {@apply tw-prose dark:tw-prose-invert}
 .section {@apply tw-p-4 tw-my-4 tw-bg-white tw-border tw-border-solid tw-border-gray-200 tw-rounded-lg tw-shadow-sm dark:tw-border-gray-700 sm:tw-p-6 dark:tw-bg-gray-800}
 .zotero-bib-container.write footer {@apply tw-bg-white dark:tw-bg-gray-950 tw-m-0}
 .zotero-bib-container.write footer a {@apply tw-underline tw-font-semibold tw-text-gray-700 dark:tw-text-gray-100 }
@@ -9,3 +11,7 @@
 .btn-lg {@apply tw-text-white tw-bg-blue-700 hover:tw-bg-blue-800 focus:tw-ring-4 focus:tw-ring-blue-300 tw-font-medium tw-rounded-lg tw-text-sm tw-px-5 tw-py-2.5 tw-mr-2 tw-mb-2 dark:tw-bg-blue-600 dark:hover:tw-bg-blue-700 focus:tw-outline-none dark:focus:tw-ring-blue-800}
 .btn-sm {@apply tw-py-2.5 tw-px-5 tw-mr-2 tw-mb-2 tw-text-sm tw-font-medium tw-text-gray-900 focus:tw-outline-none tw-bg-white tw-rounded-lg tw-border tw-border-gray-200 hover:tw-bg-gray-100 hover:tw-text-blue-700 focus:tw-z-10 focus:tw-ring-4 focus:tw-ring-gray-200 dark:focus:tw-ring-gray-700 dark:tw-bg-gray-800 dark:tw-text-gray-400 dark:tw-border-gray-600 dark:hover:tw-text-white dark:hover:tw-bg-gray-700}
 .messages {@apply tw-rounded-lg tw-mx-4}
+.modal-content {@apply tw-bg-white dark:tw-bg-gray-900}
+.modal-footer {@apply  tw-border-gray-200  dark:tw-border-gray-700}
+.about {@apply tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white}
+.section-rounded {@apply dark:tw-border-gray-700 tw-border tw-border-solid tw-border-gray-200 tw-rounded-lg tw-shadow-sm tw-bg-white dark:tw-bg-gray-800 tw-p-6}

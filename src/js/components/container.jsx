@@ -509,7 +509,7 @@ const BibWebContainer = props => {
 			action: 'Read More',
 			id: getNextMessageId(),
 			kind: 'WELCOME_MESSAGE',
-			message: 'ZoteroBib is a free service that helps you quickly create a bibliography in any citation style.',
+			message: `Hello and Welcome to Mick Schroeder's Citation Generator.`,
 		};
 		dispatch({ type: POST_MESSAGE, message });
 	}, []);

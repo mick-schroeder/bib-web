@@ -81,7 +81,7 @@ const CiteTools = ({ identifier, isTranslating, onEditorOpen, onTranslationCance
 				>
 					{ (isTranslating && canCancel) ?
 						<FormattedMessage id="zbib.general.cancel" defaultMessage="Cancel" /> :
-						<FormattedMessage id="zbib.general.cite" defaultMessage="Generate Citation" />
+						<FormattedMessage id="zbib.general.cite" defaultMessage="Suggest Citation" />
 					}
 				</Button>
 			<Button onClick={ onEditorOpen }
