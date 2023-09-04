@@ -89,7 +89,7 @@
 
 	&:hover {
 		@at-root #{selector-replace(&, ".citation", "body:not(.dnd-in-progress) .citation")} {
-			background-color: $shade-1;
+			//background-color: $shade-1;
 
 			@media (min-width: $bp-md) {
 				.drag-handle,

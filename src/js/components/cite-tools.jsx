@@ -73,16 +73,17 @@ const CiteTools = ({ identifier, isTranslating, onEditorOpen, onTranslationCance
 					type="search"
 					value={ entry }
 				/>
-				<Button
+				
+			</div>
+			<Button
 					className="btn-lg btn-secondary"
 					onClick={ handleCiteOrCancel }
 				>
 					{ (isTranslating && canCancel) ?
 						<FormattedMessage id="zbib.general.cancel" defaultMessage="Cancel" /> :
-						<FormattedMessage id="zbib.general.cite" defaultMessage="Cite" />
+						<FormattedMessage id="zbib.general.cite" defaultMessage="Generate Citation" />
 					}
 				</Button>
-			</div>
 			<Button onClick={ onEditorOpen }
 				className="btn-sm btn-outline-secondary"
 			>

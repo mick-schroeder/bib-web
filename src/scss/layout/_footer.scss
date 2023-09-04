@@ -12,10 +12,10 @@ footer {
 		padding-bottom: ($space-xxxl - 5px);
 	}
 
-	&,
+	/* &,
 	a {
 		color: inherit;
-	}
+	} */
 
 	&.faq-footer {
 		border-top-color: transparent;
@@ -69,10 +69,10 @@ footer {
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
 
-			&,
+			/* &,
 			a {
 				color: $shade-0;
-			}
+			} */
 		}
 	}
 

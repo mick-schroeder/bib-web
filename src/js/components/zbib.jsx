@@ -61,6 +61,7 @@ const ZBib = props => {
 					}
 				</div>
 				<div className='xl:tw-grid xl:tw-grid-cols-2 xl:tw-gap-4'>
+				<div>
 				{
 					!props.isReadOnly && (
 						<section className="section section-cite">
@@ -74,6 +75,7 @@ const ZBib = props => {
 				{(!props.isReadOnly && (props.isTranslating || props.itemUnderReview)) && (
 					<Review { ...pick(props, ['isTranslating', 'itemUnderReview', 'onReviewEdit', 'onReviewDelete', 'onReviewDismiss', 'styleHasBibliography']) } />
 				)}
+				</div>
 				<BibliographySection {...pick(props, ['bibliography', 'bibliographyRendered', 'bibliographyRenderedNodes',
 					'citationStyle', 'citationStyles', 'copySingleState', 'getCopyData', 'hydrateItemsCount',
 					'isHydrated', 'isNoteStyle', 'isNumericStyle', 'isPrintMode', 'isReadOnly', 'isReady',
