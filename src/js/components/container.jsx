@@ -1001,6 +1001,10 @@ const BibWebContainer = props => {
 		handleDeleteEntry(itemUnderReview.item.key);
 	}, [handleDeleteEntry, itemUnderReview]);
 
+	const handleReviewCopy = useCallback(() => {
+		handleCopySingle(itemUnderReview.item.key);
+	}, [itemUnderReview, handleCopySingle]);
+
 	const handleReviewDismiss = useCallback(() => {
 		setItemUnderReview(null);
 	}, []);
@@ -1479,6 +1483,8 @@ const BibWebContainer = props => {
 		onMultipleItemsSelect = { handleMultipleItemsSelect }
 		onReorderCitations ={ handleReorderCitations }
 		onReviewDelete = { handleReviewDelete }
+		onReviewCopy = { handleReviewCopy }
+
 		onReviewDismiss = { handleReviewDismiss }
 		onReviewEdit = { handleReviewEdit }
 		onSave = { handleSave }

@@ -73,7 +73,7 @@ const ZBib = props => {
 					)
 				}
 				{(!props.isReadOnly && (props.isTranslating || props.itemUnderReview)) && (
-					<Review { ...pick(props, ['isTranslating', 'itemUnderReview', 'onReviewEdit', 'onReviewDelete', 'onReviewDismiss', 'styleHasBibliography']) } />
+					<Review { ...pick(props, ['isTranslating', 'itemUnderReview', 'onReviewEdit', 'onReviewDelete', 'onReviewCopy','onReviewDismiss', 'styleHasBibliography']) } />
 				)}
 				</div>
 				<BibliographySection {...pick(props, ['bibliography', 'bibliographyRendered', 'bibliographyRenderedNodes',
