@@ -1,7 +1,7 @@
 footer {
 	padding: (43px - 6px) ($grid-gutter-width * 0.5) (43px - 5px);
 	text-align: center;
-	border-top: 1px solid $shade-2;
+	//border-top: 1px solid $shade-2;
 
 	@media print {
 		display: none;

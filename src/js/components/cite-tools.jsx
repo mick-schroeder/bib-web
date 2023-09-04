@@ -14,7 +14,7 @@ const CiteTools = ({ identifier, isTranslating, onEditorOpen, onTranslationCance
 	const prevIdentifier = usePrevious(identifier);
 	const wasTranslating = usePrevious(isTranslating)
 	const intl = useIntl();
-	const prompt = intl.formatMessage({ id: 'zbib.citePrompt', defaultMessage: 'Enter a URL, ISBN, DOI, PMID, arXiv ID, or title' });
+	const prompt = intl.formatMessage({ id: 'zbib.citePrompt', defaultMessage: 'Enter website URL, PubMed ID, DOI, ISBN, or other identifiers...' });
 
 	const handleChange = useCallback(newValue => {
 		setEntry(newValue);

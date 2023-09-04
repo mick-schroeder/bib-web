@@ -18,12 +18,12 @@ const Review = ({ isTranslating, itemUnderReview, onReviewEdit, onReviewDelete, 
 		>
 			{ isTranslating ? (
 					<h2 id={ id }>
-						<FormattedMessage id="zbib.review.newItem" defaultMessage="New item…" />
+						<FormattedMessage id="zbib.review.newItem" defaultMessage="Generating…" />
 					</h2>
 			) : (
 			<Fragment>
 				<h2 className="sr-only" id={ id }>
-					<FormattedMessage id="zbib.review.newItem" defaultMessage="New item…" />
+					<FormattedMessage id="zbib.review.newItem" defaultMessage="Generating…" />
 				</h2>
 				<div className="container">
 					<div dangerouslySetInnerHTML={ { __html: html } } />

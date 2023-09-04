@@ -5,7 +5,7 @@ import { useIntl, FormattedMessage } from 'react-intl';
 import { Button, Icon } from 'web-common/components';
 import { pick } from 'web-common/utils';
 
-import About from './about';
+//import About from './about';
 import BibliographySection from './bibliographySection';
 import Brand from './brand';
 import CiteTools from './cite-tools';
@@ -60,7 +60,7 @@ const ZBib = props => {
 						))
 					}
 				</div>
-				<div className='xl:tw-grid xl:tw-grid-cols-2 xl:tw-gap-4'>
+				<div className='xl:tw-grid xl:tw-grid-cols-2 xl:tw-gap-4 tw-px-4'>
 				<div>
 				{
 					!props.isReadOnly && (
@@ -115,12 +115,11 @@ const ZBib = props => {
 				}
 
 				{
-					!props.isReadOnly && (
-						<About onGetStartedClick={ props.onGetStartedClick } />
-					)
+					// !props.isReadOnly && (
+					// 	<About onGetStartedClick={ props.onGetStartedClick } />
+					// )
 				}
 
-				<Footer { ...pick(props, ['isReadOnly']) } />
 				{ (!props.isHydrated || (props.isHydrated && props.isReady)) && (
 					<Fragment>
 					<Confirmation
@@ -212,7 +211,10 @@ const ZBib = props => {
 				</Fragment>
 				) }
 			</div>
+			<Footer { ...pick(props, ['isReadOnly']) } />
+
 		</div>
+		
     );
 }
 

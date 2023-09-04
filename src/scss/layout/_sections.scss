@@ -4,13 +4,13 @@
 
 .section {
 	padding: $section-padding-mobile 0;
-	border-top: 1px solid $shade-2;
+	//border-top: 1px solid $shade-2;
 
 	@media (min-width: $bp-md) {
 		padding: $section-padding 0;
 	}
 
-	.review + & {
+	/* .review + & {
 		border-top-color: $review-border-color;
-	}
+	} */
 }
