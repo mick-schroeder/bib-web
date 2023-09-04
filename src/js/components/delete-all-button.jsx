@@ -31,7 +31,7 @@ const DeleteAllButton = props => {
 				className="btn-sm btn-outline-primary delete-all"
 				onClick={ handleDeleteAll }
 			>
-				<FormattedMessage id="zbib.bibliography.deleteAll" defaultMessage="Delete Bibliography" />
+				<FormattedMessage id="zbib.bibliography.deleteAll" defaultMessage="Clear Bibliography" />
 			</Button>
 			<Confirmation
 				key="delete-all-confirmation"
