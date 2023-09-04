@@ -5,7 +5,7 @@
 body {@apply tw-antialiased tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white}
 .faq {@apply tw-prose dark:tw-prose-invert}
 .section {@apply tw-p-4 tw-my-4 tw-bg-white tw-border tw-border-solid tw-border-gray-200 tw-rounded-lg tw-shadow-sm dark:tw-border-gray-700 sm:tw-p-6 dark:tw-bg-gray-800}
-.zotero-bib-container.write footer {@apply tw-bg-white dark:tw-bg-gray-950 tw-m-0}
+.zotero-bib-container.write footer {@apply tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white tw-m-0}
 .zotero-bib-container.write footer a {@apply tw-underline tw-font-semibold tw-text-gray-700 dark:tw-text-gray-100 }
 .form-control {@apply tw-bg-gray-50 tw-border tw-border-gray-300 tw-text-gray-900 tw-text-sm tw-rounded-lg focus:tw-ring-blue-500 focus:tw-border-blue-500 tw-block tw-w-full tw-p-2.5 dark:tw-bg-gray-700 dark:tw-border-gray-600 dark:tw-placeholder-gray-400 dark:tw-text-white dark:focus:tw-ring-blue-500 dark:focus:tw-border-blue-500}
 .btn-lg {@apply tw-text-white tw-bg-blue-700 hover:tw-bg-blue-800 focus:tw-ring-4 focus:tw-ring-blue-300 tw-font-medium tw-rounded-lg tw-text-sm tw-px-5 tw-py-2.5 tw-mr-2 tw-mb-2 dark:tw-bg-blue-600 dark:hover:tw-bg-blue-700 focus:tw-outline-none dark:focus:tw-ring-blue-800}
@@ -15,3 +15,5 @@ body {@apply tw-antialiased tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark
 .modal-footer {@apply  tw-border-gray-200  dark:tw-border-gray-700}
 .about {@apply tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white}
 .section-rounded {@apply dark:tw-border-gray-700 tw-border tw-border-solid tw-border-gray-200 tw-rounded-lg tw-shadow-sm tw-bg-white dark:tw-bg-gray-800 tw-p-6}
+.citation {@apply tw-border-gray-200 dark:tw-border-gray-600}
+.write .bibliography .citation-container:last-child {@apply tw-border-gray-200 dark:tw-border-gray-600}
