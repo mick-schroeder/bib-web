@@ -45,13 +45,13 @@
 	}
 
 	.write & {
-		&:not(.empty) {
+		/* &:not(.empty) {
 			padding-top: $section-padding-mobile - 17px;
 
 			@media (min-width: $bp-md) {
 				padding-top: $section-padding - 22px;
 			}
-		}
+		} */
 
 		.bibliography-title {
 			display: flex;
@@ -63,10 +63,10 @@
 			@media (min-width: $bp-md) {
 				margin-bottom: $space-xxl - 18px;
 
-			/* 	&:hover {
+			 /* 	&:hover {
 					background-color: $shade-1;
 					transition: background-color 0.15s 0.15s ease;
-				} */
+				} */ 
 			}
 
 			.input-group {
@@ -125,7 +125,7 @@
 			.select-control {
 				border-color: transparent;
 				background: $style-selector-bg;
-				color: $style-selector-color;
+			//	color: $style-selector-color;
 				padding: $input-padding-y-lg $input-padding-x-lg;
 				border-radius: $input-border-radius-lg;
 				cursor: pointer;

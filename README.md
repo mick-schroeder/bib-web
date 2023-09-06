@@ -25,7 +25,7 @@ Getting The Library
 
 1. `npm install`
 
-1. `npm run start`
+1. `npm run develop`
 
 This will serve demo on http://127.0.0.1:8001. 
 

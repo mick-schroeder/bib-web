@@ -10,6 +10,7 @@
   "sourceType": "module",
   "browserslist": "firefox >= 68, chrome >=67, edge >= 15, safari >= 10, last 2 versions, not dead, not ie 11, not ie 10",
   "scripts": {
+    "develop": "npm run start",
     "serve": "node scripts/server.cjs",
     "prebuild": "npm run clean -s && mkdir -p build/static/",
     "clean": "rimraf build lang",

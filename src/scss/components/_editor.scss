@@ -24,7 +24,7 @@
 
 	.key {
 		display: flex;
-		color: $label-color;
+		//color: $label-color;
 		margin-bottom: $space-min;
 		min-width: 0; // Fix truncation
 
@@ -36,7 +36,7 @@
 		}
 
 		a {
-			color: $label-color;
+			//color: $label-color;
 			text-decoration: none;
 
 			&[href]:hover {

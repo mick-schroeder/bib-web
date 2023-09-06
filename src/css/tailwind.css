@@ -5,6 +5,7 @@
 body {@apply tw-antialiased tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white}
 .faq {@apply tw-prose dark:tw-prose-invert}
 .section {@apply tw-p-4 tw-my-4 tw-bg-white tw-border tw-border-solid tw-border-gray-200 tw-rounded-lg tw-shadow-sm dark:tw-border-gray-700 sm:tw-p-6 dark:tw-bg-gray-800}
+.section-bibliography {@apply tw-pt-4 tw-pb-4 tw-pl-2 tw-pr-6}
 .zotero-bib-container.write footer {@apply tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark:tw-text-white tw-m-0}
 .zotero-bib-container.write footer a {@apply tw-underline tw-font-semibold tw-text-gray-700 dark:tw-text-gray-100 }
 .form-control {@apply tw-bg-gray-50 tw-border tw-border-gray-300 tw-text-gray-900 tw-text-sm tw-rounded-lg focus:tw-ring-blue-500 focus:tw-border-blue-500 tw-block tw-w-full tw-p-2.5 dark:tw-bg-gray-700 dark:tw-border-gray-600 dark:tw-placeholder-gray-400 dark:tw-text-white dark:focus:tw-ring-blue-500 dark:focus:tw-border-blue-500}
@@ -17,3 +18,9 @@ body {@apply tw-antialiased tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark
 .section-rounded {@apply dark:tw-border-gray-700 tw-border tw-border-solid tw-border-gray-200 tw-rounded-lg tw-shadow-sm tw-bg-white dark:tw-bg-gray-800 tw-p-6}
 .citation {@apply tw-border-gray-200 dark:tw-border-gray-600}
 .write .bibliography .citation-container:last-child {@apply tw-border-gray-200 dark:tw-border-gray-600}
+.copy-citation-dialog .preview {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600}
+.select-component .select-control {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+.select-menu-outer {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .select-option {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .select-option .is-focused {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .select-option .is-selected {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}

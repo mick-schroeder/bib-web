@@ -26,9 +26,9 @@
 			}
 		}
 
-		&.placeholder {
-			color: $placeholder-color;
-		}
+		// &.placeholder {
+		// 	color: $placeholder-color;
+		// }
 
 		@include state(".empty .editable") {
 			&::before {
@@ -47,7 +47,7 @@
 		width: calc(100% + #{2 * ($editable-border-width + $editable-padding)});
 		padding: $editable-padding;
 		border: $editable-border-width solid $editable-border-color;
-		color: $editable-color;
+		//color: $editable-color;
 		background: $editable-bg;
 		border-radius: $editable-border-radius;
 
