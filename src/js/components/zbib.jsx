@@ -130,7 +130,7 @@ const ZBib = props => {
 						onConfirm={ props.onStyleSwitchConfirm }
 						onCancel={ props.onStyleSwitchCancel }
 						title={ intl.formatMessage({ id: 'zbib.confirmCase.title', defaultMessage:'Converting Titles to Sentence Case' }) }
-						confirmLabel={ intl.formatMessage({ id: 'zbib.confirmCase.confirm', defaultMessage: 'OK. I will edit them myself.' }) }
+						confirmLabel={ intl.formatMessage({ id: 'zbib.confirmCase.confirm', defaultMessage: 'OK - Auto Sentence Case' }) }
 					>
 						<p>
 							<FormattedMessage id="zbib.confirmCase.explanation" defaultMessage="Automatically changing title to Sentence case." />

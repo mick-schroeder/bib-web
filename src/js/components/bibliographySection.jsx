@@ -95,7 +95,7 @@ const BibliographySection = props => {
 							<FormattedMessage
 								wrapRichTextChunksInFragment={ true }
 								id="zbib.bibliography.emptyLead"
-								defaultMessage='<i>T</i>o add a source, paste or type its URL, ISBN, DOI, PMID, arXiv ID, or title into the search box above'
+								defaultMessage='To suggest a new citation, enter a URL, ISBN, DOI, PubMed ID (PMID), arXiv ID, or title.'
 								values={ {
 									i: chunks => <span style={{ 'letterSpacing': '-0.111em' }}>{chunks}</span>, //eslint-disable-line react/display-name
 								}}

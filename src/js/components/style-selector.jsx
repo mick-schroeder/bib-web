@@ -14,6 +14,8 @@ const StyleSelector = ({ className, citationStyle, citationStyles, onCitationSty
 
 	return (
 			<div className={ cx('style-selector', className ) }>
+			<label htmlFor="zbib.styleSelector.label" class="tw-text-left tw-block tw-mb-2 tw-text-sm tw-font-medium tw-text-gray-900 dark:tw-text-white">Select Style</label>
+
 				<Select
 					aria-label={ intl.formatMessage({
 						id: 'zbib.styleSelector.label',

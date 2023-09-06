@@ -21,6 +21,14 @@ body {@apply tw-antialiased tw-bg-gray-50 dark:tw-bg-gray-900 tw-text-black dark
 .copy-citation-dialog .preview {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600}
 .select-component .select-control {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
 .select-menu-outer {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
- .select-option {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
- .select-option .is-focused {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
- .select-option .is-selected {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .select-option {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white  hover:tw-bg-gray-400 hover:dark:tw-bg-gray-400  hover:dark:tw-text-black hover:tw-text-white}
+ .select-component .select-menu-outer {@apply tw-bg-gray-50 dark:tw-bg-gray-900  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .select-component .select-option {@apply tw-bg-gray-50 dark:tw-bg-gray-900 tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .is-selected {@apply tw-bg-gray-200 dark:tw-bg-gray-600  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .is-focused {@apply tw-bg-gray-200 dark:tw-bg-gray-600  tw-border-gray-200 dark:tw-border-gray-600 tw-text-black dark:tw-text-white}
+ .select-component .select-option.is-selected		{@apply tw-text-black dark:tw-text-white  tw-bg-blue-400 dark:tw-bg-blue-600 hover:tw-bg-gray-400 hover:dark:tw-bg-gray-400}
+ .select-component .select-option.is-focused		{@apply tw-text-black dark:tw-text-white  tw-bg-blue-200 dark:tw-bg-blue-500 hover:tw-bg-gray-400 hover:dark:tw-bg-gray-400}
+ .select-component.is-mouse .select-option:hover {@apply tw-bg-blue-200 dark:tw-bg-blue-500 hover:tw-bg-gray-400 hover:dark:tw-bg-gray-700}
+.style-selector .select-component .select-value-label {@apply  tw-text-white dark:tw-text-white tw-font-normal}
+.delete-all {@apply tw-border-red-500 dark:tw-border-red-400  tw-text-red-500 dark:tw-text-red-400}
+.butt-green {@apply tw-border-green-500 dark:tw-border-green-400  tw-text-green-500 dark:tw-text-green-400}

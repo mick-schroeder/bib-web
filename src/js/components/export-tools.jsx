@@ -138,6 +138,8 @@ const ExportTools = props => {
 
 	return (
 		<div className="export-tools">
+		<h3 className="tw-text-left tw-my-3">Export</h3>
+		<p className="tw-text-left tw-font-normal tw-text-gray-500 dark:tw-text-gray-400">Export your bibliography into many formats. Copy a formatted bibliography to your clipboard, HTML (for websites) or Download .RTF (for word processors), .RIS, .BibTeX, or save to Zotero.</p>
 			<Dropdown
 				isOpen={ isDropdownOpen }
 				onToggle={ handleToggleDropdown }

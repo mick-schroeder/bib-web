@@ -56,11 +56,14 @@ const CiteTools = ({ identifier, isTranslating, onEditorOpen, onTranslationCance
 
 	return (
 		<div className="cite-tools">
+		<label htmlFor="cifdsa" class="tw-text-left tw-block tw-mb-2 tw-text-sm tw-font-medium tw-text-gray-900 dark:tw-text-white">Enter Query</label>
+
 			<div className="id-input-container">
 				<Input
 					aria-label={ prompt }
 					autoFocus
 					className="form-control form-control-lg id-input"
+					id="cifdsa"
 					isBusy={ isTranslating }
 					isReadOnly={ isTranslating }
 					onBlur={ () => true /* do not commit on blur */ }
